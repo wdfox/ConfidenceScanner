@@ -107,6 +107,17 @@ class Paper(Base):
 
 
 
+def init_papers(ids):
+
+	papers = [Paper(id) for id in ids]
+
+	for paper in papers:
+		extract_add_info(paper)
+
+	return papers
+
+
+
 
     # def scrape_data(self, search_term):
     	
@@ -139,6 +150,7 @@ class Press_Release(Base):
   ############################### CON - WORDS - FUNCTIONS (PRIVATE) #################################
 #######################################################################################################
 
+@CatchNone
 def process_text(text):
 	"""Processes abstract text - sets to lower case, and removes stopwords and punctuation.
 
@@ -161,6 +173,7 @@ def process_text(text):
 												& word.isalnum())]
 
 
+@CatchNone
 def _process_authors(author_list):
     """
 
@@ -225,3 +238,24 @@ def extract(dat, tag, how):
     except AttributeError:
         return None
 
+
+
+
+
+
+
+################################################################################################
+################################## ERPSC - UTILS - DECORATORS ##################################
+################################################################################################
+
+def CatchNone(func):
+    """Decorator function to catch and return None, if given as argument."""
+
+    def wrapper(arg):
+
+        if arg is not None:
+            return func(arg)
+        else:
+            return None
+
+    return wrapper
