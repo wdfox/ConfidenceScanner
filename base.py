@@ -1,4 +1,8 @@
-
+""" git status
+    git add
+    git commit -m ""
+    git push
+    git diff """
 
 import datetime
 from bs4 import BeautifulSoup
