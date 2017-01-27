@@ -15,7 +15,7 @@ def build_search(search_term, db="db=pubmed", retmax=str(3)):
 	return search
 
 
-def build_fetch(uid, db="db=pubmed",retmode="retmode=html"):
+def build_fetch(uid, db="db=pubmed",retmode="retmode=xml"):
 
 	fetch_base = base_url + "efectch.fcgi?"
 	fetch = fetch_base + db + "&" + retmode + "&" + "id=" + uid
