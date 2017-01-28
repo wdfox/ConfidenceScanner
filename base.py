@@ -99,7 +99,7 @@ class Paper(Base):
 		article = self.req.get_url(fetch_url)
 		article_soup = BeautifulSoup(article.content, "lxml")
 
-		cur_art = self.extract_add_info(article_soup)
+		self.extract_add_info(article_soup)
 
 		self.req.close()
 
@@ -143,6 +143,32 @@ class Press_Release(Base):
 	"""
 	def extract/add info (or do this in base and use that fxn)
 	"""
+
+
+
+
+
+
+
+################################################################################################
+################################## ERPSC - UTILS - DECORATORS ##################################
+################################################################################################
+
+def CatchNone(func):
+    """Decorator function to catch and return None, if given as argument."""
+
+    def wrapper(arg):
+
+        if arg is not None:
+            return func(arg)
+        else:
+            return None
+
+    return wrapper
+
+
+
+
 
 
 
@@ -238,24 +264,3 @@ def extract(dat, tag, how):
     except AttributeError:
         return None
 
-
-
-
-
-
-
-################################################################################################
-################################## ERPSC - UTILS - DECORATORS ##################################
-################################################################################################
-
-def CatchNone(func):
-    """Decorator function to catch and return None, if given as argument."""
-
-    def wrapper(arg):
-
-        if arg is not None:
-            return func(arg)
-        else:
-            return None
-
-    return wrapper
