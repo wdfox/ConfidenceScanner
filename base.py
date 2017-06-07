@@ -4,8 +4,6 @@
     git push
     git diff """
 
-# THIS IS MY REALLY IMPORTANT ADDITION!
-
 import datetime
 from bs4 import BeautifulSoup
 import nltk
@@ -78,15 +76,11 @@ class Paper(Base):
 		deal with missing data, since fields may be missing.
 		"""
 
-		# Add ID of current article
-
-		self.title = extract(article, 'ArticleTitle', 'str')
-		self.authors = _process_authors(extract(article, 'AuthorList', 'raw'))
-		self.journal = extract(article, 'Title', 'str'), extract(article, 'ISOAbbreciation', 'str')
-		self.text = process_text(extract(article, 'AbstractText', 'str'))
-		self.year = extract(extract(article, 'DateCreated', 'raw'), 'Year', 'str')
-
-		# What do I return?
+		self.title = extract(article, 'articletitle', 'str')
+		self.authors = _process_authors(extract(article, 'authorlist', 'raw'))
+		self.journal = extract(article, 'title', 'str'), extract(article, 'isoabbreviation', 'str')
+		self.text = process_text(extract(article, 'abstracttext', 'str'))
+		self.year = extract(extract(article, 'datecreated', 'raw'), 'year', 'str')
 
 
 	def scrape_data(self):
@@ -95,9 +89,11 @@ class Paper(Base):
 		self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
 		fetch_url = build_fetch(self.id)
+		print(fetch_url)
 
 		article = self.req.get_url(fetch_url)
 		article_soup = BeautifulSoup(article.content, "lxml")
+		print(article_soup)
 
 		self.extract_add_info(article_soup)
 
@@ -215,15 +211,15 @@ def _process_authors(author_list):
     """
 
     # Pull out all author tags from the input
-    authors = extract(author_list, 'Author', 'all')
+    authors = extract(author_list, 'author', 'all')
 
     # Initialize list to return
     out = []
 
     # Extract data for each author
     for author in authors:
-        out.append((extract(author, 'LastName', 'str'), extract(author, 'ForeName', 'str'),
-                    extract(author, 'Initials', 'str'), extract(author, 'Affiliation', 'str')))
+        out.append((extract(author, 'lastname', 'str'), extract(author, 'forename', 'str'),
+                    extract(author, 'initials', 'str'), extract(author, 'affiliation', 'str')))
 
     return out
 
