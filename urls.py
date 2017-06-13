@@ -51,25 +51,12 @@ def ids_to_str(ids):
 	return str_ids
 
 
-search = build_search("aging")
-ids = get_ids(search)
-print(ids)
-
-fetch = build_fetch(ids[0])
-print(fetch)
-
 """ Control Flow:
 
 	1) Pick a search term
 	2) Get a number of paper ids associated with that term
 	3) Loop through ids, cleaning and saving the information from each paper to a new object
 	4) Then deal with the data/Analyze
-
-
-papers = []
-for uid in str_ids:
-	papers.append(Paper(uid))
-	HOW TO USE SCRAPE DATA method?
 
 
 Then the real fun begins:
