@@ -5,7 +5,7 @@
     git diff """
 
 import datetime
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, SoupStrainer
 import nltk
 from nltk.corpus import stopwords
 from urls import *
@@ -89,11 +89,10 @@ class Paper(Base):
 		self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
 		fetch_url = build_fetch(self.id)
-		print(fetch_url)
 
 		article = self.req.get_url(fetch_url)
-		article_soup = BeautifulSoup(article.content, "lxml")
-		print(article_soup)
+		article_soup = BeautifulSoup(article.content, 'lxml')
+		# print(article_soup)
 
 		self.extract_add_info(article_soup)
 
@@ -115,14 +114,25 @@ def init_papers(ids):
 
 
 
-    # def scrape_data(self, search_term):
-    	
-    # 	search = build_search(search_term)
-    	
-    # 	ids = get_ids(search)
 
-    # 	for uid in ids:
-    # 		fetch = build_fetch(uid)
+
+def crawl():
+
+	links = []
+	base_url = "https://www.nih.gov/news-events/news-releases"
+
+	page = Requester()
+	page = page.get_url(base_url)
+	page_soup = BeautifulSoup(page.text, 'lxml', parse_only=SoupStrainer('a', href=True))
+	# print(page_soup.prettify())
+
+
+	for link in page_soup.find_all('a'):
+		something = link.get('href')
+		if something not in links and '/news-events/news-releases' in something:
+			links.append(link.get('href'))
+
+	print(links)
 
 
 
@@ -136,9 +146,43 @@ class Press_Release(Base):
 		self.source = str()  # NIH
 
 
-	"""
-	def extract/add info (or do this in base and use that fxn)
-	"""
+	def scrape_data(self):
+
+		self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+
+		# url = find_urls()
+		url = "https://www.nih.gov/news-events/news-releases/pregnancy-diet-high-refined-grains-could-increase-child-obesity-risk-age-7-nih-study-suggests"
+
+		article = self.req.get_url(url)
+		pr_soup = BeautifulSoup(article.content, "lxml")
+
+		self.extract_add_info(pr_soup)
+
+		self.req.close()
+
+
+	def extract_add_info(self, article):
+
+		self.source = article.find("meta", property="og:site_name")
+		self.title = extract(article, 'title', 'str')
+		self.text = article.find_all("body")
+		self.year = article.find("meta", property="article:published_time")
+		# self.year = extract(extract(article, 'published_date', 'raw'), 'year', 'str')
+
+
+
+	# def find_urls(self, site="https://www.nih.gov/news-events/news-releases"):
+
+
+
+""" Necessary functions:
+	1) Get the data from a press release: scrape_data() + extract(), just like for papers
+	2) Scrape through the NIH website to compile links to all the different press releases """
+
+
+"""
+def extract/add info (or do this in base and use that fxn)
+"""
 
 
 
@@ -187,7 +231,10 @@ def process_text(text):
 		List of words, after processing.
 	"""
 
+	text = text.decode('utf-8')
+
 	# Tokenize input text
+	# words = nltk.word_tokenize(text)
 	words = nltk.word_tokenize(text)
 
 	# Remove stop words, and non-alphabetical tokens (punctuation). Return the result.
