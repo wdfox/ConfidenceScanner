@@ -51,6 +51,25 @@ def ids_to_str(ids):
 	return str_ids
 
 
+def crawl():
+
+	links = []
+	base_url = "https://www.nih.gov/news-events/news-releases"
+
+	page = Requester()
+	page = page.get_url(base_url)
+	page_soup = BeautifulSoup(page.text, 'lxml', parse_only=SoupStrainer('a', href=True))
+	# print(page_soup.prettify())
+
+
+	for link in page_soup.find_all('a'):
+		something = link.get('href')
+		if something not in links and '/news-events/news-releases' in something:
+			links.append(link.get('href'))
+
+	print(links)
+
+
 """ Control Flow:
 
 	1) Pick a search term
@@ -71,6 +90,5 @@ Then the real fun begins:
 		Could we do it for only papers or only press releases? Might be harder to compare that way
 	Compare length--Maybe length has nothing to do with it, just the author
 	
-
 
 	"""
