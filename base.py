@@ -76,11 +76,14 @@ class Paper(Base):
 		deal with missing data, since fields may be missing.
 		"""
 
-		self.title = extract(article, 'articletitle', 'str')
-		self.authors = _process_authors(extract(article, 'authorlist', 'raw'))
-		self.journal = extract(article, 'title', 'str'), extract(article, 'isoabbreviation', 'str')
-		self.text = process_text(extract(article, 'abstracttext', 'str'))
-		self.year = extract(extract(article, 'datecreated', 'raw'), 'year', 'str')
+
+		# Working: title, journal, text, year; Need help: authors
+		self.title = article.articletitle.text
+		self.authors = _process_authors(article.authorlist)
+		# self.authors = _process_authors(extract(article, 'authorlist', 'raw'))
+		self.journal = article.title.text, article.isoabbreviation.text
+		self.text = process_text(article.abstracttext.text)
+		self.year = int(article.datecreated.year.text)
 
 
 	def scrape_data(self):
@@ -97,6 +100,21 @@ class Paper(Base):
 		self.extract_add_info(article_soup)
 
 		self.req.close()
+
+		self.type_check()
+
+
+	def type_check(self):
+
+		assert isinstance(self.id, str)
+		assert isinstance(self.title, str)
+		assert isinstance(self.authors, list)
+		assert isinstance(self.journal, tuple)
+		assert isinstance(self.text, list)
+		assert isinstance(self.year, int)
+
+		print('All checks passed!')
+
 
 
 
@@ -116,34 +134,23 @@ def init_papers(ids):
 
 
 
-def crawl():
-
-	links = []
-	base_url = "https://www.nih.gov/news-events/news-releases"
-
-	page = Requester()
-	page = page.get_url(base_url)
-	page_soup = BeautifulSoup(page.text, 'lxml', parse_only=SoupStrainer('a', href=True))
-	# print(page_soup.prettify())
-
-
-	for link in page_soup.find_all('a'):
-		something = link.get('href')
-		if something not in links and '/news-events/news-releases' in something:
-			links.append(link.get('href'))
-
-	print(links)
-
-
-
-
 class Press_Release(Base):
 
-	def __init__(self):
+	def __init__(self, url):
 
 		Base.__init__(self)
 
+		self.url = url
 		self.source = str()  # NIH
+
+
+	def extract_add_info(self, article):
+
+		# Working: title, source, year--year is a bit gimmicky tho...; Need help: text
+		self.title = article.title.text
+		self.source = article.find('meta', property='og:site_name')['content']
+		self.text = article.find_all(name='p', class_=False)
+		self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
 
 
 	def scrape_data(self):
@@ -151,40 +158,29 @@ class Press_Release(Base):
 		self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
 		# url = find_urls()
-		url = "https://www.nih.gov/news-events/news-releases/pregnancy-diet-high-refined-grains-could-increase-child-obesity-risk-age-7-nih-study-suggests"
+		# url = "https://www.nih.gov/news-events/news-releases/pregnancy-diet-high-refined-grains-could-increase-child-obesity-risk-age-7-nih-study-suggests"
 
-		article = self.req.get_url(url)
+		article = self.req.get_url(self.url)
 		pr_soup = BeautifulSoup(article.content, "lxml")
+
+		# print(pr_soup)
 
 		self.extract_add_info(pr_soup)
 
 		self.req.close()
 
-
-	def extract_add_info(self, article):
-
-		self.source = article.find("meta", property="og:site_name")
-		self.title = extract(article, 'title', 'str')
-		self.text = article.find_all("body")
-		self.year = article.find("meta", property="article:published_time")
-		# self.year = extract(extract(article, 'published_date', 'raw'), 'year', 'str')
+		self.type_check()
 
 
+	def type_check(self):
 
-	# def find_urls(self, site="https://www.nih.gov/news-events/news-releases"):
+		assert isinstance(self.url, str)
+		assert isinstance(self.title, str)
+		assert isinstance(self.source, str)
+		# assert isinstance(self.text, list)
+		assert isinstance(self.year, int)
 
-
-
-""" Necessary functions:
-	1) Get the data from a press release: scrape_data() + extract(), just like for papers
-	2) Scrape through the NIH website to compile links to all the different press releases """
-
-
-"""
-def extract/add info (or do this in base and use that fxn)
-"""
-
-
+		print('All checks passed!')
 
 
 
@@ -231,10 +227,7 @@ def process_text(text):
 		List of words, after processing.
 	"""
 
-	text = text.decode('utf-8')
-
 	# Tokenize input text
-	# words = nltk.word_tokenize(text)
 	words = nltk.word_tokenize(text)
 
 	# Remove stop words, and non-alphabetical tokens (punctuation). Return the result.
@@ -258,17 +251,35 @@ def _process_authors(author_list):
     """
 
     # Pull out all author tags from the input
-    authors = extract(author_list, 'author', 'all')
+    authors = author_list.find_all('author')
+    authors = authors[0]
+	# authors = extract(author_list, 'author', 'all')
 
     # Initialize list to return
     out = []
 
     # Extract data for each author
     for author in authors:
-        out.append((extract(author, 'lastname', 'str'), extract(author, 'forename', 'str'),
-                    extract(author, 'initials', 'str'), extract(author, 'affiliation', 'str')))
+    	out.append((authors.find('lastname').text, authors.find('forename').text, authors.find('initials').text, authors.find('affiliation').text))
+        # out.append((extract(author, 'lastname', 'str'), extract(author, 'forename', 'str'),
+         #            extract(author, 'initials', 'str'), extract(author, 'affiliation', 'str')))
 
     return out
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def extract(dat, tag, how):
