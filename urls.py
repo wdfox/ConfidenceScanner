@@ -70,6 +70,40 @@ def crawl():
 	print(links)
 
 
+
+
+
+'''
+Dictionary for storing NIH Databases and their respective search terms for papers
+Top section is for sites that should be easier to navigate, bottom sections are each more difficult
+Some subdivisions of the NIH were omitted completely because there were not helpful (no science occuring) or too difficult to navigate
+'''
+
+db_terms = {
+			# Easiest/Closest to existing code
+			'https://www.cancer.gov/news-events': 'cancer', 
+			'https://nei.nih.gov/news/pressreleases': 'eye?', 
+			'https://www.nia.nih.gov/newsroom/press-releases': 'aging', 
+			'https://www.niaaa.nih.gov/news-events/news-releases': 'alcohol abuse, alcoholism',
+			'https://www.niaid.nih.gov/news-events/news-releases': 'allergy, infectious diseases', 
+			'https://www.drugabuse.gov/news-events/news': 'drug abuse',
+			'https://www.ninds.nih.gov/News-Events/News-and-Press-Releases/Press-Releases': 'stroke',
+
+			# Medium difficulty
+			'https://www.nichd.nih.gov/news/releases/Pages/news.aspx': 'child health, human dev',
+			'https://www.niddk.nih.gov/news/Pages/news-releases.aspx': 'diabetes, digestive and kidney disease',
+
+			# These look either hard or not that useful
+			'https://www.nimh.nih.gov/news/index.shtml': 'mental health',
+			'https://www.niehs.nih.gov/news/newsroom/releases/index.cfm': 'environmental health sciences',
+			'https://www.nhlbi.nih.gov/news/press-releases': 'heart, lung, blood', 
+			'https://www.genome.gov/10000475/current-news-releases/': 'genome',
+			'https://www.niams.nih.gov/News_and_Events/': 'arthritis, skin diseases', 
+			'https://www.nibib.nih.gov/news-events/newsroom?news-type=29&health-terms=All&pub-date%5Bvalue%5D%5Byear%5D=': 'bioengineering'
+			}
+
+
+
 """ Control Flow:
 
 	1) Pick a search term
@@ -78,7 +112,7 @@ def crawl():
 	4) Then deal with the data/Analyze
 
 
-Then the real fun begins:
+Then analysis:
 
 	Start with basic sentiment and/or confidence analysis
 		(High vs low confidence terms? Linguistics professor?)
