@@ -72,15 +72,12 @@ class Paper(Base):
 
 		NOTES
 		-----
-		- Data extraction is all in try/except statements in order to
-		deal with missing data, since fields may be missing.
+		- May be necessary to consider the possibility of papers missing one or more of these fields...
 		"""
 
 
-		# Working: title, journal, text, year; Need help: authors
 		self.title = article.articletitle.text
 		self.authors = _process_authors(article.authorlist)
-		# self.authors = _process_authors(extract(article, 'authorlist', 'raw'))
 		self.journal = article.title.text, article.isoabbreviation.text
 		self.text = process_text(article.abstracttext.text)
 		self.year = int(article.datecreated.year.text)
@@ -95,16 +92,15 @@ class Paper(Base):
 
 		article = self.req.get_url(fetch_url)
 		article_soup = BeautifulSoup(article.content, 'lxml')
-		# print(article_soup)
 
 		self.extract_add_info(article_soup)
 
 		self.req.close()
 
-		self.type_check()
+		self._check_type()
 
 
-	def type_check(self):
+	def _check_type(self):
 
 		assert isinstance(self.id, str)
 		assert isinstance(self.title, str)
@@ -157,21 +153,17 @@ class Press_Release(Base):
 
 		self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
-		# url = "https://www.nih.gov/news-events/news-releases/pregnancy-diet-high-refined-grains-could-increase-child-obesity-risk-age-7-nih-study-suggests"
-
 		article = self.req.get_url(self.url)
 		pr_soup = BeautifulSoup(article.content, "lxml")
-
-		# print(pr_soup)
 
 		self.extract_add_info(pr_soup)
 
 		self.req.close()
 
-		self.type_check()
+		self._check_type()
 
 
-	def type_check(self):
+	def _check_type(self):
 
 		assert isinstance(self.url, str)
 		assert isinstance(self.title, str)
@@ -251,69 +243,12 @@ def _process_authors(author_list):
 
     # Pull out all author tags from the input
     authors = author_list.find_all('author')
-    authors = authors[0]
-	# authors = extract(author_list, 'author', 'all')
 
     # Initialize list to return
     out = []
 
     # Extract data for each author
     for author in authors:
-    	out.append((authors.find('lastname').text, authors.find('forename').text, authors.find('initials').text, authors.find('affiliation').text))
-        # out.append((extract(author, 'lastname', 'str'), extract(author, 'forename', 'str'),
-         #            extract(author, 'initials', 'str'), extract(author, 'affiliation', 'str')))
+    	out.append((author.find('lastname').text, author.find('forename').text, author.find('initials').text, author.find('affiliation').text))
 
     return out
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def extract(dat, tag, how):
-    """Extract data from HTML tag.
-
-    Parameters
-    ----------
-    dat : bs4.element.Tag
-        HTML data to pull specific tag out of.
-    tag : str
-        Label of the tag to extract.
-    how : {'raw', 'all' , 'txt', 'str'}
-        Method to extract the data.
-            raw - extract an embedded tag
-            all - extract all embedded tags
-            txt - extract text as unicode
-            str - extract text and convert to string
-
-    Returns
-    -------
-    {bs4.element.Tag, bs4.element.ResultSet, unicode, str, None}
-        Requested data from the tag. Returns None is requested tag is unavailable.
-    """
-
-    # Use try to be robust to missing tag
-    try:
-        if how is 'raw':
-            return dat.find(tag)
-        elif how is 'txt':
-            return dat.find(tag).text
-        elif how is 'str':
-            return dat.find(tag).text.encode('ascii', 'ignore')
-        elif how is 'all':
-            return dat.findAll(tag)
-
-    except AttributeError:
-        return None
-
