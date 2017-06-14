@@ -157,7 +157,6 @@ class Press_Release(Base):
 
 		self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
-		# url = find_urls()
 		# url = "https://www.nih.gov/news-events/news-releases/pregnancy-diet-high-refined-grains-could-increase-child-obesity-risk-age-7-nih-study-suggests"
 
 		article = self.req.get_url(self.url)
