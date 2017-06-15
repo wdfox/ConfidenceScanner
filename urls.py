@@ -1,7 +1,7 @@
 """ Functions for Searching and Retrieving Papers """
 
 from requester import Requester
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, SoupStrainer
 
 
 base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
@@ -81,8 +81,7 @@ Some subdivisions of the NIH were omitted completely because there were not help
 
 db_terms = {
 			# Easiest/Closest to existing code
-			'https://www.cancer.gov/news-events': 'cancer', 
-			'https://nei.nih.gov/news/pressreleases': 'eye?', 
+			'https://www.cancer.gov/news-events': 'cancer',  
 			'https://www.nia.nih.gov/newsroom/press-releases': 'aging', 
 			'https://www.niaaa.nih.gov/news-events/news-releases': 'alcohol abuse, alcoholism',
 			'https://www.niaid.nih.gov/news-events/news-releases': 'allergy, infectious diseases', 
@@ -90,6 +89,7 @@ db_terms = {
 			'https://www.ninds.nih.gov/News-Events/News-and-Press-Releases/Press-Releases': 'stroke',
 
 			# Medium difficulty
+			'https://nei.nih.gov/news/pressreleases': 'eye?', 
 			'https://www.nichd.nih.gov/news/releases/Pages/news.aspx': 'child health, human dev',
 			'https://www.niddk.nih.gov/news/Pages/news-releases.aspx': 'diabetes, digestive and kidney disease',
 
