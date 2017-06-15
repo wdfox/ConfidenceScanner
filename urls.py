@@ -53,21 +53,36 @@ def ids_to_str(ids):
 
 def crawl():
 
-	links = []
+	pr_links = []
+	page_links = []
+	year_links = []
+	page_number = 0
+
 	base_url = "https://www.nih.gov/news-events/news-releases"
 
 	page = Requester()
 	page = page.get_url(base_url)
 	page_soup = BeautifulSoup(page.text, 'lxml', parse_only=SoupStrainer('a', href=True))
-	# print(page_soup.prettify())
 
 
+	# Not gonna lie sorting through these links is a bit gimmicky
 	for link in page_soup.find_all('a'):
 		something = link.get('href')
-		if something not in links and '/news-events/news-releases' in something:
-			links.append(link.get('href'))
+		if something not in pr_links and 'news-releases/' in something:
+			pr_links.append(link.get('href'))
+		elif something not in page_links and 'page' in something:
+			page_links.append(link.get('href'))
+		elif something not in year_links and 'news-releases?2' in something:
+			year_links.append(link.get('href'))
 
-	print(links)
+
+	# This definition along with the page_number probably belongs in run_script
+	next_page_url = base_url + '?page=' + str(page_number+1)
+
+
+	print(pr_links)
+	print(page_links)
+	print(year_links)
 
 
 
