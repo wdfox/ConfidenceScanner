@@ -5,10 +5,11 @@
     git diff """
 
 import datetime
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import BeautifulSoup
 import nltk
 from nltk.corpus import stopwords
-from urls import *
+import urls
+import requester
 
 class Base():
 	"""Base class for running confidence analysis
@@ -30,11 +31,15 @@ class Base():
 		self.year = str()
 
 		# Requester object for handling URL objects
-		self.req = Requester()
+		self.req = requester.Requester()
 
 		# Initialize for date that data is collected
 		self.date = str()
 
+	
+
+	def analyze(self):
+		pass
 	"""
 	def set
 	def set file
@@ -79,7 +84,7 @@ class Paper(Base):
 		self.title = article.articletitle.text
 		self.authors = _process_authors(article.authorlist)
 		self.journal = article.title.text, article.isoabbreviation.text
-		self.text = process_text(article.abstracttext.text)
+		self.text = process_paper(article.abstracttext.text)
 		self.year = int(article.datecreated.year.text)
 
 
@@ -88,7 +93,7 @@ class Paper(Base):
 		# Set date of when data was collected
 		self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
-		fetch_url = build_fetch(self.id)
+		fetch_url = urls.build_fetch(self.id)
 
 		article = self.req.get_url(fetch_url)
 		article_soup = BeautifulSoup(article.content, 'lxml')
@@ -113,8 +118,7 @@ class Paper(Base):
 
 
 
-
-
+# Move to a script file
 
 def init_papers(ids):
 
@@ -137,15 +141,15 @@ class Press_Release(Base):
 		Base.__init__(self)
 
 		self.url = url
-		self.source = str()  # NIH
+		self.source = str()
 
 
 	def extract_add_info(self, article):
 
-		# Working: title, source, year--year is a bit gimmicky tho...; Need help: text
+		# Working: title, source, year--year is a bit gimmicky tho...; Need help: text?
 		self.title = article.title.text
 		self.source = article.find('meta', property='og:site_name')['content']
-		self.text = article.find_all(name='p', class_=False)
+		self.text = process_pr(article)
 		self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
 
 
@@ -168,7 +172,7 @@ class Press_Release(Base):
 		assert isinstance(self.url, str)
 		assert isinstance(self.title, str)
 		assert isinstance(self.source, str)
-		# assert isinstance(self.text, list)
+		assert isinstance(self.text, list)
 		assert isinstance(self.year, int)
 
 		print('All checks passed!')
@@ -182,7 +186,8 @@ class Press_Release(Base):
 ################################################################################################
 
 def CatchNone(func):
-    """Decorator function to catch and return None, if given as argument."""
+    """Decorator function to catch and return None, 
+    			if given as argument."""
 
     def wrapper(arg):
 
@@ -197,14 +202,12 @@ def CatchNone(func):
 
 
 
-
-
 #######################################################################################################
   ############################### CON - WORDS - FUNCTIONS (PRIVATE) #################################
 #######################################################################################################
 
 @CatchNone
-def process_text(text):
+def process_paper(abstract):
 	"""Processes abstract text - sets to lower case, and removes stopwords and punctuation.
 
 	Parameters
@@ -219,11 +222,33 @@ def process_text(text):
 	"""
 
 	# Tokenize input text
-	words = nltk.word_tokenize(text)
+	words = nltk.word_tokenize(abstract)
 
 	# Remove stop words, and non-alphabetical tokens (punctuation). Return the result.
 	return [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
 												& word.isalnum())]
+
+
+@CatchNone
+def process_pr(article):
+	'''This funciton is essentially all heuristics for sorting through press release stuff'''
+
+	text = str()
+
+	tags = article.find_all(name='p', class_=False)
+	# print(tags)
+	
+	for tag in tags:
+		tag = tag.get_text()
+		if tag[0:9] != 'About the':
+			text += tag
+		else:
+			break
+
+	words = nltk.word_tokenize(text)
+
+	return [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
+											& word.isalnum())]
 
 
 @CatchNone
@@ -249,6 +274,9 @@ def _process_authors(author_list):
 
     # Extract data for each author
     for author in authors:
-    	out.append((author.find('lastname').text, author.find('forename').text, author.find('initials').text, author.find('affiliation').text))
+    	out.append((author.find('lastname').text, 
+    				author.find('forename').text, 
+    				author.find('initials').text, 
+    				author.find('affiliation').text))
 
     return out
