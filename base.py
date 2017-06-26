@@ -9,112 +9,112 @@ from bs4 import BeautifulSoup
 import nltk
 from nltk.corpus import stopwords
 import urls
-import requester
+from requester import Requester
 
 class Base():
-	"""Base class for running confidence analysis
+    """Base class for running confidence analysis
 
-	Attributes
-	----------
+    Attributes
+    ----------
 
-	"""
+    """
 
-	def __init__(self):
-		
-		# Initialize the lists of confidence terms used
-		self.high_confidence = list()
-		self.low_confidence = list()
+    def __init__(self):
+        
+        # Initialize the lists of confidence terms used
+        self.high_confidence = list()
+        self.low_confidence = list()
 
-		# Initialize to store basic data pulled from papers/press releases
-		self.title = str()
-		self.text = str()
-		self.year = str()
+        # Initialize to store basic data pulled from papers/press releases
+        self.title = str()
+        self.text = str()
+        self.year = str()
 
-		# Requester object for handling URL objects
-		self.req = requester.Requester()
+        # Requester object for handling URL objects
+        self.req = Requester()
 
-		# Initialize for date that data is collected
-		self.date = str()
+        # Initialize for date that data is collected
+        self.date = str()
 
-	
+    
 
-	def analyze(self):
-		pass
-	"""
-	def set
-	def set file
-	def check
-	def unload
-	def get db info
-	def analyze
-	"""
+    def analyze(self):
+        pass
+    """
+    def set
+    def set file
+    def check
+    def unload
+    def get db info
+    def analyze
+    """
 
 
 
 class Paper(Base):
 
-	def __init__(self, id):
+    def __init__(self, id):
 
-		Base.__init__(self)
+        Base.__init__(self)
 
-		self.id = id
+        self.id = id
 
-		self.authors = str()
-		self.journal = str()
-
-
-	def extract_add_info(self, article):
-		"""Extract information from article web page and add to
-
-		Parameters
-		----------
-		cur_erp : ERPData() object
-			Object to store information for the current ERP term.
-		new_id : int
-			Paper ID of the new paper.
-		art : bs4.element.Tag() object
-			Extracted pubmed article.
-
-		NOTES
-		-----
-		- May be necessary to consider the possibility of papers missing one or more of these fields...
-		"""
+        self.authors = str()
+        self.journal = str()
 
 
-		self.title = article.articletitle.text
-		self.authors = _process_authors(article.authorlist)
-		self.journal = article.title.text, article.isoabbreviation.text
-		self.text = process_paper(article.abstracttext.text)
-		self.year = int(article.datecreated.year.text)
+    def extract_add_info(self, article):
+        """Extract information from article web page and add to
+
+        Parameters
+        ----------
+        cur_erp : ERPData() object
+            Object to store information for the current ERP term.
+        new_id : int
+            Paper ID of the new paper.
+        art : bs4.element.Tag() object
+            Extracted pubmed article.
+
+        NOTES
+        -----
+        - May be necessary to consider the possibility of papers missing one or more of these fields...
+        """
 
 
-	def scrape_data(self):
-
-		# Set date of when data was collected
-		self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-
-		fetch_url = urls.build_fetch(self.id)
-
-		article = self.req.get_url(fetch_url)
-		article_soup = BeautifulSoup(article.content, 'lxml')
-
-		self.extract_add_info(article_soup)
-
-		self.req.close()
-
-		self._check_type()
+        self.title = article.articletitle.text
+        self.authors = _process_authors(article.authorlist)
+        self.journal = article.title.text, article.isoabbreviation.text
+        self.text = process_paper(article.abstracttext.text)
+        self.year = int(article.datecreated.year.text)
 
 
-	def _check_type(self):
+    def scrape_data(self):
 
-		assert isinstance(self.id, str)
-		assert isinstance(self.title, str)
-		assert isinstance(self.authors, list)
-		assert isinstance(self.journal, tuple)
-		assert isinstance(self.text, list)
-		assert isinstance(self.year, int)
+        # Set date of when data was collected
+        self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
-		print('All checks passed!')
+        fetch_url = urls.build_fetch(self.id)
+
+        article = self.req.get_url(fetch_url)
+        article_soup = BeautifulSoup(article.content, 'lxml')
+
+        self.extract_add_info(article_soup)
+
+        self.req.close()
+
+        self._check_type()
+
+
+    def _check_type(self):
+
+        assert isinstance(self.id, str)
+        assert isinstance(self.title, str)
+        assert isinstance(self.authors, list)
+        assert isinstance(self.journal, tuple)
+        assert isinstance(self.text, list)
+        assert isinstance(self.year, int)
+
+        print('All checks passed!')
 
 
 
@@ -122,12 +122,12 @@ class Paper(Base):
 
 def init_papers(ids):
 
-	papers = [Paper(id) for id in ids]
+    papers = [Paper(id) for id in ids]
 
-	for paper in papers:
-		extract_add_info(paper)
+    for paper in papers:
+        extract_add_info(paper)
 
-	return papers
+    return papers
 
 
 
@@ -136,46 +136,46 @@ def init_papers(ids):
 
 class Press_Release(Base):
 
-	def __init__(self, url):
+    def __init__(self, url):
 
-		Base.__init__(self)
+        Base.__init__(self)
 
-		self.url = url
-		self.source = str()
-
-
-	def extract_add_info(self, article):
-
-		# Working: title, source, year--year is a bit gimmicky tho...; Need help: text?
-		self.title = article.title.text
-		self.source = article.find('meta', property='og:site_name')['content']
-		self.text = process_pr(article)
-		self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
+        self.url = url
+        self.source = str()
 
 
-	def scrape_data(self):
+    def extract_add_info(self, article):
 
-		self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-
-		article = self.req.get_url(self.url)
-		pr_soup = BeautifulSoup(article.content, "lxml")
-
-		self.extract_add_info(pr_soup)
-
-		self.req.close()
-
-		self._check_type()
+        # Working: title, source, year--year is a bit gimmicky tho...; Need help: text?
+        self.title = article.title.text
+        self.source = article.find('meta', property='og:site_name')['content']
+        self.text = process_pr(article)
+        self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
 
 
-	def _check_type(self):
+    def scrape_data(self):
 
-		assert isinstance(self.url, str)
-		assert isinstance(self.title, str)
-		assert isinstance(self.source, str)
-		assert isinstance(self.text, list)
-		assert isinstance(self.year, int)
+        self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
-		print('All checks passed!')
+        article = self.req.get_url(self.url)
+        pr_soup = BeautifulSoup(article.content, "lxml")
+
+        self.extract_add_info(pr_soup)
+
+        self.req.close()
+
+        self._check_type()
+
+
+    def _check_type(self):
+
+        assert isinstance(self.url, str)
+        assert isinstance(self.title, str)
+        assert isinstance(self.source, str)
+        assert isinstance(self.text, list)
+        assert isinstance(self.year, int)
+
+        print('All checks passed!')
 
 
 
@@ -187,7 +187,7 @@ class Press_Release(Base):
 
 def CatchNone(func):
     """Decorator function to catch and return None, 
-    			if given as argument."""
+                if given as argument."""
 
     def wrapper(arg):
 
@@ -208,47 +208,47 @@ def CatchNone(func):
 
 @CatchNone
 def process_paper(abstract):
-	"""Processes abstract text - sets to lower case, and removes stopwords and punctuation.
+    """Processes abstract text - sets to lower case, and removes stopwords and punctuation.
 
-	Parameters
-	----------
-	text : str
-		Text as one long string.
+    Parameters
+    ----------
+    text : str
+        Text as one long string.
 
-	Returns
-	-------
-	words_cleaned : list of str
-		List of words, after processing.
-	"""
+    Returns
+    -------
+    words_cleaned : list of str
+        List of words, after processing.
+    """
 
-	# Tokenize input text
-	words = nltk.word_tokenize(abstract)
+    # Tokenize input text
+    words = nltk.word_tokenize(abstract)
 
-	# Remove stop words, and non-alphabetical tokens (punctuation). Return the result.
-	return [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
-												& word.isalnum())]
+    # Remove stop words, and non-alphabetical tokens (punctuation). Return the result.
+    return [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
+                                                & word.isalnum())]
 
 
 @CatchNone
 def process_pr(article):
-	'''This funciton is essentially all heuristics for sorting through press release stuff'''
+    '''This funciton is essentially all heuristics for sorting through press release stuff'''
 
-	text = str()
+    text = str()
 
-	tags = article.find_all(name='p', class_=False)
-	# print(tags)
-	
-	for tag in tags:
-		tag = tag.get_text()
-		if tag[0:9] != 'About the':
-			text += tag
-		else:
-			break
+    tags = article.find_all(name='p', class_=False)
+    # print(tags)
+    
+    for tag in tags:
+        tag = tag.get_text()
+        if tag[0:9] != 'About the':
+            text += tag
+        else:
+            break
 
-	words = nltk.word_tokenize(text)
+    words = nltk.word_tokenize(text)
 
-	return [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
-											& word.isalnum())]
+    return [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
+                                            & word.isalnum())]
 
 
 @CatchNone
@@ -274,9 +274,9 @@ def _process_authors(author_list):
 
     # Extract data for each author
     for author in authors:
-    	out.append((author.find('lastname').text, 
-    				author.find('forename').text, 
-    				author.find('initials').text, 
-    				author.find('affiliation').text))
+        out.append((author.find('lastname').text, 
+                    author.find('forename').text, 
+                    author.find('initials').text, 
+                    author.find('affiliation').text))
 
     return out
