@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup, SoupStrainer
 base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 
 
-def build_search(search_term, db="db=pubmed", retmax=str(3)):
+def build_search(search_term, retmax, db="db=pubmed"):
 
     search_base = base_url + "esearch.fcgi?"
     search = search_base + db + "&" + "term=" + search_term + "&" + "retmax=" + retmax
@@ -51,43 +51,41 @@ def ids_to_str(ids):
     return str_ids
 
 
-def crawl():
 
-    pr_links = []
+def crawl(start_url, page_number=0, pr_links=list()):
+
     page_links = []
     year_links = []
-    page_number = 0
 
-    base_url = "https://www.nih.gov/news-events/news-releases"
 
-    page = Requester()
-    page = page.get_url(base_url)
+    req = Requester()
+    page = req.get_url(start_url)
+    title = BeautifulSoup(page.text, 'lxml').title.text
     page_soup = BeautifulSoup(page.text, 'lxml', parse_only=SoupStrainer('a', href=True))
 
 
     # Not gonna lie sorting through these links is a bit gimmicky
-    for link in page_soup.find_all('a'):
-        something = link.get('href')
-        if something not in pr_links and 'news-releases/' in something:
-            pr_links.append(link.get('href'))
-        elif something not in page_links and 'page' in something:
-            page_links.append(link.get('href'))
-        elif something not in year_links and 'news-releases?2' in something:
-            year_links.append(link.get('href'))
+    for tag in page_soup.find_all('a'):
+        link = tag.get('href')
+        if link not in pr_links and 'news-releases/' in link and link != '/news-releases/feed.xml':
+            pr_links.append(link)
+
+        # elif link not in page_links and 'page' in link:
+        #     page_links.append(tag.get('href'))
+        # elif link not in year_links and 'news-releases?2' in link:
+        #     year_links.append(tag.get('href'))
 
 
-    # This definition along with the page_number probably belongs in run_script
-    next_page_url = base_url + '?page=' + str(page_number+1)
-
-    # Use a recursive call here to loop through the function until the maximum number of pages have been visited
-    # Or you could also pick a maximum number of press releases to collect as opposed to a number of pages to visit
+    page_number += 1
+    next_page_url = 'https://www.nih.gov/news-events/news-releases?page=' + str(page_number)
 
 
-    print(pr_links)
-    print(page_links)
-    print(year_links)
+    # Should I use recursion (as I do here) or opt instead for the nested for loops and use a fxn to build all web pages?
+    # Recursive call here to run through all PR pages
+    if 'The page you’re looking for isn’t available' not in title and page_number < 2:
+        crawl(next_page_url, page_number, pr_links)
 
-
+    return(pr_links)
 
 
 
@@ -99,11 +97,12 @@ Some subdivisions of the NIH were omitted completely because there were not help
 
 db_terms = {
             # Easiest/Closest to existing code
-            'https://www.cancer.gov/news-events': 'cancer',  
-            'https://www.nia.nih.gov/newsroom/press-releases': 'aging', 
-            'https://www.niaaa.nih.gov/news-events/news-releases': 'alcohol abuse, alcoholism',
-            'https://www.niaid.nih.gov/news-events/news-releases': 'allergy, infectious diseases', 
-            'https://www.drugabuse.gov/news-events/news': 'drug abuse',
+            'https://www.cancer.gov/news-events': 'cancer',  # Not very many PRs
+            'https://www.nia.nih.gov/newsroom/press-releases': 'aging', # Works the same as NIH
+            'https://www.niaaa.nih.gov/news-events/news-releases': 'alcohol abuse, alcoholism', # Same as NIH
+            'https://www.niaid.nih.gov/news-events/news-releases': 'allergy, infectious diseases', # All on 1 page
+            'https://www.drugabuse.gov/news-events/news': 'drug abuse', # Same as NIH
+            
             'https://www.ninds.nih.gov/News-Events/News-and-Press-Releases/Press-Releases': 'stroke',
 
             # Medium difficulty
