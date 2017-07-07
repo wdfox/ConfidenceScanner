@@ -12,25 +12,25 @@ def collect_papers(search_term, paper_count):
     papers = []
     for id in ids:
         papers.append(base.Paper(id))
-        # would it work to do paper.scrape_data() right here?
         # do I have to check whether the paper with a given id is already in the saved data??? Or can I just scrape a new file every time?
 
     for paper in papers:
         paper.scrape_data()
-        data.save('Papers', paper, search_term)
+        data.save('Papers', search_term, paper)
 
 
 
 
+def collect_prs(db_url="https://www.nih.gov/news-events/news-releases", pr_count):
 
-def collect_prs(database, pr_count):
-
-    # crawl() AND collect a bunch of urls
+    pr_links = urls.crawl(db_url)
 
     prs = []
-    for url in urls:
-        prs.append(base.Press_Release(url))
+    for link in pr_links:
+        if len(prs) <= pr_count:
+            prs.append(base.Press_Release(db_url+link))
 
     for pr in prs:
         pr.scrape_data()
-        data.save('PRs', pr, database)
+        # DB means database
+        data.save('PRs', db_url, pr)
