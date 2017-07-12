@@ -220,14 +220,14 @@ class Press_Release(Base):
         NOTES
         -----
         - May be necessary to consider the possibility of papers missing one or more of these fields...
+        - Maybe look into improving the process_pr() function and underlying heuristics
+        - May need to change the self.year extraction
         """
 
         # Set attributes to be the extracted info from press release.
         self.title = article.title.text
         self.source = article.find('meta', property='og:site_name')['content']
-        # Perhaps the process_pr() function could be refined
         self.text = process_pr(article)
-        # May need to fix this - it's a bit gimmicky
         self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
 
 

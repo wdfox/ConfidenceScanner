@@ -2,12 +2,13 @@
 import base
 import requester
 import urls
+from scripts.scripts import collect_papers, collect_prs
 
 """ Tests for scraping """
 
 # PubMed
 
-# search = urls.build_search("aging")
+# search = urls.build_search("aging", '3')
 # ids = urls.get_ids(search)
 # print(ids)
 
@@ -39,7 +40,13 @@ import urls
 
 # NIH Crawler
 
-# urls.crawl()
+# urls.crawl("https://www.nih.gov/news-events/news-releases")
+
+
+# Paper and PR Mass collection
+
+# papers = collect_papers(paper_count='3', search_term='aging')
+# prs = collect_prs(pr_count='10', db_url="https://www.nih.gov/news-events/news-releases")
 
 
 
@@ -53,14 +60,19 @@ and paper with url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?d
 
 save in json (use dictionary) --> look at erp_data.py for save and load methods
 
+NOTES:
+- Funny characters just seemed to get passed in and parsed like normal. Any use in removing them? Would this affect normalizing for length?
+- Other study only looked at MAIN causal claims--but what if the text later works to caveat the main claim?
+
+
 
 TO DO:
 
 1) Save and load scraped info in json files (getting there)
-2) Check how funny characters get handled (should be straight-forward)
-3) Create method for analysis
-4) Create run script for mass paper collection (just need to test it out and work on saving)
-5) Write function to cycle through NIH website and collect urls (almost done)
-6) Create run script for mass pr collection (reliant on the above, should be easy after that is figured out)
+2) Create method for analysis (perhaps check out nltk.sentiment package)
+3) Create run script for mass paper collection (just need to test it out and work on saving)
+4) Test crawl function (should be able to find 357 pages, but stops after 13)
+5) Create run script for mass pr collection (should work once saving gets figured out)
+6) Journal press releases versus university versus national institute?
 
 """
