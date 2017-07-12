@@ -8,6 +8,7 @@
    and storing paper and press release info."""
 
 import datetime
+import string
 from bs4 import BeautifulSoup
 import nltk
 from nltk.corpus import stopwords
@@ -51,8 +52,16 @@ class Base():
         # Initialize for date that data is collected
         self.date = str()
 
-    
 
+    def remove_special_characters(self):
+        """Deletes words with non ascii.lower characters from self.text"""
+
+        for word in self.text:
+            for letter in word:
+                if letter not in string.ascii_lowercase:
+                    self.text.remove(word)
+
+    
     def analyze(self):
         """Runs confidence analysis on text from paper or press release."""
         pass
@@ -153,7 +162,7 @@ class Paper(Base):
 
 
     def _check_type(self):
-        """Ensures all attributes of a paper object are of the right type."""
+        """Ensures all attributes of a paper object are of the correct type."""
 
         assert isinstance(self.id, str)
         assert isinstance(self.title, str)
@@ -253,7 +262,7 @@ class Press_Release(Base):
 
 
     def _check_type(self):
-        """Ensures all attributes of a press release object are of the right type."""
+        """Ensures all attributes of a press release object are of the correct type."""
 
         assert isinstance(self.url, str)
         assert isinstance(self.title, str)
@@ -368,6 +377,10 @@ def _process_authors(author_list):
     -------
     out : list of tuple of (str, str, str, str)
         List of authors, each as (LastName, FirstName, Initials, Affiliation).
+
+    Notes
+    -----
+    - Perhaps add a try, except deal here to make sure it doesn't freak out if one of the fields is missing
     """
 
     # Pull out all author tags from the input
