@@ -3,25 +3,73 @@
 
 import base
 import json
+import os
 
 
 
-# import os
+def build_path(data_type, search_term, root_dir='Data/'):
+    """Gives the path to the save locations of paper or pr objects
 
-# # NOT SUPER PORTABLE BETWEEN USERS - should I even do it this way?
-# def save_location(search_type, search_term):
-	
-# 	# Search term refers to a specific keywork if search_type is paper or a specific pr database if the type is pr
-#     base = 'Users/wdfox/Documents/GitCode/Confidence_Scanner/Data/'
-#     path = base + str(search_type) + '/' + str(search_term)
+    Parameters
+    ----------
+    data_type : str
+        Type of data (Paper or Press_Release) to be found
+    search_term : str
+        PubMed search term (papers) or government database (press releases) used to find the given info
+    root_dir : str
+        Directory that the JSON files will be saved under
 
-#     if not os.path.isdir(path):
-#         os.makedirs(path)
+    Returns
+    -------
+    path : str
+        Path to the data stored matching the given parameters
+    """
 
-#     return(path)
+    # Join the elements together to create the desired path
+    path = os.path.join(root_dir, data_type, search_term)
+
+    # If the path doesn't already exist in the system, make it
+    if not os.path.isdir(path):
+        os.makedirs(path)
+
+    return(path)
 
 
-def save(data_type, search_term, data):
+def assign_outfile(index):
+    """Assign a four digit JSON filename to save a paper or pr
+
+    Parameters
+    ----------
+    index : int
+        Looping index from 0, starting over each search, to ensure UNIQUE digits are assigned
+
+    Returns
+    -------
+    outfile : str
+        Contains the name of the file where the object will be saved
+
+    Notes
+    -----
+    - All outfiles will be four digit numbers, with zeros at the start for shorter numbers
+        - E.g. The fourteenth object saved will be saved at '0013.json' (indexed from '0000')
+    """
+
+    # New variable to create a string outfile name
+    i = str(index)
+
+    # Generate the proper number of zeros, given the index
+    zeros = '0' * (4 - len(i))
+
+    # Join the zeros before the index to create the save ID
+    id = zeros + i
+
+    # Save in JSON file format
+    outfile = id + '.json'
+
+    return(outfile)
+
+
+def save(data_type, search_term, data, outfile):
     """Saves data from paper or press release object to JSON
 
     Parameters
@@ -32,26 +80,27 @@ def save(data_type, search_term, data):
         PubMed search term (papers) or government database (press releases) used to find the given info
     data : Paper object or Press_Release object
         Extracted info from the paper or press release
-
-    Notes
-    -----
-    - Doesn't really work as expected right now
-    - The problem could be here, or perhaps in the scripts file... Not sure...
+    outfile : str
+        Filename associated with a given paper for organizational purposes
     """
 
+    # Get the directory to save the data in
+    directory = build_path(data_type, search_term)
+
+    # Build the path for the individual file to be saved at
+    path = os.path.join(directory, outfile)
+
     # Convert our information into a savable dictionary format
-    info_dict = data.__dict__
-    # Get rid of the reqester object, which is unable to be saved directly to JSON
-    del info_dict['req']
+    info_dict = data.__dict__()
 
     # Save information to the path generated, each entry on its own line
-    with open('/Users/wdfox/Documents/GitCode/Confidence_Scanner/Data/' + data_type + '/' + search_term + '.json', 'w') as outfile:
+    with open(path, 'w') as outfile:
         json.dump(info_dict, outfile)
-        outfile.write('\n')
 
 
-def load(data_type, search_term):
-    """Load paper and press release info for analysis
+
+def load_folder(data_type, search_term, root_dir='Data/'):
+    """Load paper or press release info from an entire directory for analysis
 
     Parameters
     ----------
@@ -59,39 +108,96 @@ def load(data_type, search_term):
         Type of data (Paper or Press_Release) to be saved
     search_term : str
         PubMed search term (papers) or government database (press releases) used to find the given info
+    root_dir : str
+        Directory that the JSON files are saved under
+
+    Returns
+    -------
+    items : list of Paper or Press_Release objects
+        List of all papers or prs saved in a given directory
 
     Notes
     -----
-    - This function is a long way from being ready to use
+    - For a given type and search term, check the available files and load each one into a paper or pr object
     """
 
-    filename = 'Users/wdfox/Documents/GitCode/Confidence_Scanner/Data/' + data_type + '/' + search_term + '.json'
-    
-    for l in open(filename):
-        yield json.loads(l)
+    # Give the path to the desired directory
+    path = os.path.join(root_dir, data_type, search_term)
 
-    # All of this is very speculative right now
-    # Once I recover my original dictionary:
-    papers = []
+    # List all files in the directory
+    files = os.listdir(path)
 
-    for line in json_file:
-        
-        info_dict = {}
-        
-        if data_type == 'Paper':
-            paper = base.Paper(info_dict['id'])
-            paper.title = info_dict['title']
-            paper.authors
-            paper.journal
-            paper.text = info_dict['text']
-            paper.year = info_dict['year']
-            paper.date = info_dict['date']
+    # Initialize a list to store the paper or press release objects generated
+    items = []
 
-        elif data_type == 'PR':
-            pr = base.Press_Release(info_dict['url'])
-            pr.title
-            pr.source
-            pr.text
-            pr.year
-            pr.date
+    # Go through directory, loading each file into an individual object, append to items
+    if data_type == 'Papers':
+        for file in files:
+            items.append(load_paper_json(file))
+    elif data_type == 'PRs':
+        for file in files:
+            items.append(load_pr_json(file))
+
+    return(items)
+
+
+def load_paper_json(path):
+    """Load an individual paper object from JSON file
+
+    Parameters
+    ----------
+    path : str
+        Path to the save location of the desired paper to load
+
+    Returns
+    -------
+    paper : Paper object
+        Paper object with attributes populated from the JSON file
+
+    Notes
+    -----
+    - Not sure whether I should be using json.load or json.loads here
+    """
+
+    info_dict = json.loads(path)
+
+    paper = base.Paper(info_dict['id'])
+    paper.title = info_dict['title']
+    paper.authors = info_dict['authors']
+    paper.journal = info_dict['journal']
+    paper.text = info_dict['text']
+    paper.year = info_dict['year']
+    paper.date = info_dict['date']
+
+    return(paper)
+
+
+def load_pr_json(path):
+    """Load an individual Press_Release object from JSON file
+
+    Parameters
+    ----------
+    path : str
+        Path to the save location of the desired press release to load
+
+    Returns
+    -------
+    pr : Press_Release object
+        Press_Release object with attributes populated from the JSON file
+
+    Notes
+    -----
+    - Not sure whether I should be using json.load or json.loads here
+    """
+
+    info_dict = json.loads(path)
+
+    pr = base.Press_Release(info_dict['url'])
+    pr.title = info_dict['title']
+    pr.text = info_dict['text']
+    pr.source = info_dict['source']
+    pr.year = info_dict['year']
+    pr.date = info_dict['date']
+
+    return(pr)
 
