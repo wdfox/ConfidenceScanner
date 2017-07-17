@@ -1,4 +1,3 @@
-
 ''' Functions for saving and loading data into json file format '''
 
 import base
@@ -98,7 +97,6 @@ def save(data_type, search_term, data, outfile):
         json.dump(info_dict, outfile)
 
 
-
 def load_folder(data_type, search_term, root_dir='Data/'):
     """Load paper or press release info from an entire directory for analysis
 
@@ -122,10 +120,11 @@ def load_folder(data_type, search_term, root_dir='Data/'):
     """
 
     # Give the path to the desired directory
-    path = os.path.join(root_dir, data_type, search_term)
+    directory = os.path.join(root_dir, data_type, search_term)
 
     # List all files in the directory
-    files = os.listdir(path)
+    files = os.listdir(directory)
+    print(files)
 
     # Initialize a list to store the paper or press release objects generated
     items = []
@@ -133,10 +132,12 @@ def load_folder(data_type, search_term, root_dir='Data/'):
     # Go through directory, loading each file into an individual object, append to items
     if data_type == 'Papers':
         for file in files:
-            items.append(load_paper_json(file))
+            path = os.path.join(directory, file)
+            items.append(load_paper_json(path))
     elif data_type == 'PRs':
         for file in files:
-            items.append(load_pr_json(file))
+            path = os.path.join(directory, file)
+            items.append(load_pr_json(path))
 
     return(items)
 
@@ -159,8 +160,11 @@ def load_paper_json(path):
     - Not sure whether I should be using json.load or json.loads here
     """
 
-    info_dict = json.loads(path)
+    # Retrieve the JSON file
+    with open(path) as file:
+        info_dict = json.load(file)
 
+    # Populate the paper attributes
     paper = base.Paper(info_dict['id'])
     paper.title = info_dict['title']
     paper.authors = info_dict['authors']
@@ -190,8 +194,11 @@ def load_pr_json(path):
     - Not sure whether I should be using json.load or json.loads here
     """
 
-    info_dict = json.loads(path)
+    # Retrieve the JSON file
+    with open(path) as file:
+        info_dict = json.load(file)
 
+    # Populate the pr attributes
     pr = base.Press_Release(info_dict['url'])
     pr.title = info_dict['title']
     pr.text = info_dict['text']
