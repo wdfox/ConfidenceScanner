@@ -1,5 +1,4 @@
-
-""" Functions for Searching and Retrieving Papers """
+'''Functions for Searching and Retrieving Papers'''
 
 from requester import Requester
 from bs4 import BeautifulSoup, SoupStrainer
@@ -9,7 +8,7 @@ from bs4 import BeautifulSoup, SoupStrainer
 base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 
 
-def build_search(search_term, retmax, db="db=pubmed"):
+def build_search(search_term, retmax, use_hist=False, db="db=pubmed"):
     """Build URL to search for papers associated with certain keywords.
 
     Parameters
@@ -36,7 +35,7 @@ def build_search(search_term, retmax, db="db=pubmed"):
     return search
 
 
-def build_fetch(uid, retmode="retmode=xml", db="db=pubmed"):
+def build_fetch(uid, use_hist=False, retmode="retmode=xml", db="db=pubmed"):
     """Function for finding a specific paper given its ID
 
     Parameters
@@ -87,7 +86,6 @@ def get_ids(search_url):
 
     # Get all the ids from the page
     ids = page_soup.find_all("id")
-    print(type(ids))
 
     # Convert IDs to str
     str_ids = ids_to_str(ids)
@@ -122,6 +120,54 @@ def ids_to_str(ids):
         str_ids.append(uid[4:-5])
 
     return str_ids
+
+
+def use_history():
+    """Handles large paper calls with NCBI Use History
+
+    Returns
+    -------
+    papers : list of Paper objects
+        List of paper objects collected in the database search
+
+    Notes
+    -----
+    - Un-tested, not totally sure if it works yet, must integrate with rest of code as well
+    - Not sure whether to use scrape_data() function or extract_add_info()?
+    """
+
+    papers = []
+
+    ret_start = 0
+    ret_max = 100
+
+    count = int(page_soup.find('count').text)
+    web_env = page_soup.find('webenv').text
+    query_key = page_soup.find('querykey').text
+
+    while ret_start < count:
+
+        art_url = # FIGURE THIS OUT
+        art_page = self.req.get_url(art_url)
+        page_soup = BeautifulSoup(art_page.content, 'lxml')
+
+        # Pull out articles
+        articles = page_soup.find_all('PubmedArticle')
+
+        # Loop through articles
+        for article in articles:
+
+            # For each article, pull the ID and extract relevant info
+            paper = base.Paper(article.find('id'))
+            # paper.scrape_data() OR paper.extract_add_info()?
+
+            # Add each paper to the list to be returned
+            papers.append(paper)
+
+        # Increment ret_start to get next batch of papers
+        ret_start += ret_max
+
+    return(papers)
 
 
 def crawl(start_url, page_number=0, pr_links=list()):
@@ -221,19 +267,6 @@ db_terms = {
     2) Get a number of paper ids associated with that term
     3) Loop through ids, cleaning and saving the information from each paper to a new object
     4) Then deal with the data/Analyze
-
-
-Then analysis:
-
-    Start with basic sentiment and/or confidence analysis
-        (High vs low confidence terms? Linguistics professor?)
-    Does it vary by area of research?
-    Is the bias even developed in this stage of the process? 
-        Perhaps papers themselves are overconfident or only positive findings get published?
-    Does it make sense to normalize the confidence by the length of the paper? 
-        More text would seem to qualify any sentimentby adding more info. Perhaps it would double the effect of confidence seen
-        Could we do it for only papers or only press releases? Might be harder to compare that way
-    Compare length--Maybe length has nothing to do with it, just the author
 	
 
     """
