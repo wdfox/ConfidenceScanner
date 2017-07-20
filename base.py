@@ -4,8 +4,8 @@
     git push
     git diff """
 
-"""Classes and functions for collecting, cleaning 
-   and storing paper and press release info."""
+'''Classes and functions for collecting, cleaning 
+   and storing paper and press release info.'''
 
 import datetime
 import string
@@ -16,8 +16,7 @@ import urls
 from requester import Requester
 
 
-
-class Base():
+class Base(object):
     """Base class for running confidence analysis
 
     Attributes
@@ -54,7 +53,11 @@ class Base():
 
 
     def remove_special_characters(self):
-        """Deletes words with non ascii.lower characters from self.text"""
+        """Deletes words with non ascii_lower characters from self.text
+
+        Notes
+        -----
+        - Use the scrape_data method first"""
 
         for word in self.text:
             for letter in word:
@@ -63,7 +66,28 @@ class Base():
 
     
     def analyze(self):
-        """Runs confidence analysis on text from paper or press release."""
+        """Runs confidence analysis on text from paper or press release.
+
+        Notes
+        -----
+        - Perhaps we could use NLTK sentiment analyzer and train it on data sets from Sumner or other people
+        - Demo liu hu lexicon?
+        - Demo subjectivity? by Pang and Lee?
+        - Consider using VADER? Must cite the authors
+        - Biggest problems for NLTK seem to be when the writing has a strange context (ironic, sarcastic) which shouldn't be an issue for us
+        - What if we trained an algorithm on papers and prs and then had it try to sort unknown texts into one of the categories and see if it can?
+        - Maybe consider not tokenizing by words, but by sentence or phrase as well?
+        - Linguistic Inquiry and Work Count (LIWC) -- (http://liwc.wpengine.com)
+        - Wordnet (http://wordnet.princeton.edu/), SentiWordnet (http://sentiwordnet.isti.cnr.it/)
+        - Pointwise Mutual Information for Information Retrieval? (PMI-IR)
+        - Perhaps use SentiStrength for positive/negitive identification
+        - Useful powerpoint (https://lct-master.org/files/MullenSentimentCourseSlides.pdf)
+        - Word database development paper (https://arxiv.org/pdf/1103.2903.pdf)
+        - Use text level (reading/writing level) as a control
+        - Consider not tokenizing text, save both ways
+        - python textblob library maybe?
+
+        """
         pass
 
 
@@ -87,9 +111,9 @@ class Paper(Base):
     id : str
         ID number of the paper from PubMed database.
     authors : list of tuple of (str, str, str, str)
-        List of authors, each as (LastName, FirstName, Initials, Affiliation).
+        List of authors, as (LastName, FirstName, Initials, Affiliation).
     journal : tuple (str, str)
-        Tuple containing both the journal's full title and its abbreviated one.
+        Tuple containing the journal's full and abbreviated titles.
 
     See Also
     --------
@@ -116,6 +140,20 @@ class Paper(Base):
         self.journal = tuple()
 
 
+    def __dict__(self):
+        """Creates a dictionary to store the paper object's attributes."""
+
+        return {
+                'id' : self.id,
+                'title' : self.title,
+                'text' : self.text,
+                'authors' : self.authors,
+                'journal' : self.journal,
+                'year' : self.year,
+                'date' : self.date
+                }
+
+
     def extract_add_info(self, article):
         """Extract information from PubMed paper.
 
@@ -126,7 +164,7 @@ class Paper(Base):
 
         NOTES
         -----
-        - May be necessary to consider the possibility of papers missing one or more of these fields...
+        - Possible that papers may be missing one or more of these fields
         """
 
         # Set attributes to be the extracted info from PubMed article.
@@ -149,7 +187,7 @@ class Paper(Base):
         # Use Requester() object to open the paper URL
         article = self.req.get_url(fetch_url)
 
-        # Use BeautifulSoup to get paper into a more convenient format for extraction
+        # Get paper into a more convenient format for info extraction
         article_soup = BeautifulSoup(article.content, 'lxml')
 
         self.extract_add_info(article_soup)
@@ -162,7 +200,7 @@ class Paper(Base):
 
 
     def _check_type(self):
-        """Ensures all attributes of a paper object are of the correct type."""
+        """Ensures all attributes are of the correct type."""
 
         assert isinstance(self.id, str)
         assert isinstance(self.title, str)
@@ -170,8 +208,6 @@ class Paper(Base):
         assert isinstance(self.journal, tuple)
         assert isinstance(self.text, list)
         assert isinstance(self.year, int)
-
-        print('All checks passed!')
 
 
 
@@ -198,6 +234,11 @@ class Press_Release(Base):
     See Also
     --------
     - Attributes of Base class.
+
+    Notes
+    -----
+    - May be worth looking into other sources of press releases as well
+        - E.g. journals, universities, EurekAlert!
     """
 
     def __init__(self, url):
@@ -218,6 +259,19 @@ class Press_Release(Base):
         self.source = str()
 
 
+    def __dict__(self):
+        """Creates a dictionary to store the pr object's attributes."""
+
+        return {
+                'url' : self.url,
+                'title' : self.title,
+                'text' : self.text,
+                'source' : self.source,
+                'year' : self.year,
+                'date' : self.date
+                }
+
+
     def extract_add_info(self, article):
         """Extract information from press release web page.
 
@@ -228,8 +282,8 @@ class Press_Release(Base):
 
         NOTES
         -----
-        - May be necessary to consider the possibility of papers missing one or more of these fields...
-        - Maybe look into improving the process_pr() function and underlying heuristics
+        - Possible that prs may be missing one or more of these fields
+        - process_pr() function and pr heuristics could be improved
         - May need to change the self.year extraction
         """
 
@@ -249,7 +303,7 @@ class Press_Release(Base):
         # Use Requester() object to open the paper URL
         article = self.req.get_url(self.url)
 
-        # Use BeautifulSoup to get paper into a more convenient format for extraction
+        # Get paper into a more convenient format for extraction
         pr_soup = BeautifulSoup(article.content, "lxml")
 
         self.extract_add_info(pr_soup)
@@ -262,7 +316,7 @@ class Press_Release(Base):
 
 
     def _check_type(self):
-        """Ensures all attributes of a press release object are of the correct type."""
+        """Ensures all attributes are of the correct type."""
 
         assert isinstance(self.url, str)
         assert isinstance(self.title, str)
@@ -270,15 +324,13 @@ class Press_Release(Base):
         assert isinstance(self.text, list)
         assert isinstance(self.year, int)
 
-        print('All checks passed!')
 
 
 
 
-
-################################################################################################
-################################## ERPSC - UTILS - DECORATORS ##################################
-################################################################################################
+##########################################################################
+####################### COMSC - UTILS - DECORATORS #######################
+##########################################################################
 
 def CatchNone(func):
     """Decorator function to catch and return None, 
@@ -297,13 +349,13 @@ def CatchNone(func):
 
 
 
-#######################################################################################################
-  ############################### CON - WORDS - FUNCTIONS (PRIVATE) #################################
-#######################################################################################################
+#########################################################################
+################## CON - WORDS - FUNCTIONS (PRIVATE) ####################
+#########################################################################
 
 @CatchNone
 def process_paper(abstract):
-    """Processes abstract text - sets to lower case, and removes stopwords and punctuation.
+    """Sets abstract text to lower case, removes stopwords and punctuation.
 
     Parameters
     ----------
@@ -319,14 +371,14 @@ def process_paper(abstract):
     # Tokenize input text
     words = nltk.word_tokenize(abstract)
 
-    # Remove stop words, and non-alphabetical tokens (punctuation). Return the result.
+    # Remove stop words, and non-alphabetical tokens (punctuation).
     return [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
                                                 & word.isalnum())]
 
 
 @CatchNone
 def process_pr(article):
-    """Processes press release text - sets to lower case, and removes stopwords and punctuation.
+    """Set pr text to lower case, removes stopwords and punctuation.
 
     Parameters
     ----------
@@ -340,7 +392,7 @@ def process_pr(article):
     
     Notes
     -----
-    - This function is largely just heuristics right now - could be improved.
+    - This function is just heuristics right now - could be improved.
     """
 
     text = str()
@@ -366,7 +418,7 @@ def process_pr(article):
 
 @CatchNone
 def _process_authors(author_list):
-    """ Reformats information about paper authors.
+    """Reformats information about paper authors.
 
     Parameters
     ----------
@@ -376,11 +428,11 @@ def _process_authors(author_list):
     Returns
     -------
     out : list of tuple of (str, str, str, str)
-        List of authors, each as (LastName, FirstName, Initials, Affiliation).
+        List of authors, as (LastName, FirstName, Initials, Affiliation).
 
     Notes
     -----
-    - Perhaps add a try, except deal here to make sure it doesn't freak out if one of the fields is missing
+    - Current try except could be cleaned up?
     """
 
     # Pull out all author tags from the input
@@ -389,11 +441,20 @@ def _process_authors(author_list):
     # Initialize list to return
     out = []
 
-    # Extract data for each author
+    # Extract data for each author, checking for missing fields
     for author in authors:
-        out.append((author.find('lastname').text, 
-                    author.find('forename').text, 
-                    author.find('initials').text, 
-                    author.find('affiliation').text))
+        out.append((_check_extract(author, 'lastname'),
+                    _check_extract(author, 'forename'),
+                    _check_extract(author, 'initials'),
+                    _check_extract(author, 'affiliation')
+                    ))
 
     return out
+
+
+def _check_extract(tag, label):
+    
+    try:
+        return tag.find(label).text
+    except:
+        return None
