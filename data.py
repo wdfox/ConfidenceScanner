@@ -4,6 +4,7 @@ import base
 import json
 import os
 
+from shutil import copy2
 
 
 def build_path(data_type, search_term, root_dir='Data/'):
@@ -27,73 +28,85 @@ def build_path(data_type, search_term, root_dir='Data/'):
     # Join the elements together to create the desired path
     path = os.path.join(root_dir, data_type, search_term)
 
+    # If the path does exist, ask the user if they are okay with overwriting data
+    if os.path.isdir(path):
+        clear_db(path)
+
     # If the path doesn't already exist in the system, make it
-    if not os.path.isdir(path):
+    elif not os.path.isdir(path):
         os.makedirs(path)
 
     return(path)
 
 
-def assign_outfile(index):
-    """Assign a four digit JSON filename to save a paper or pr
+def clear_db(path):
+    """Ensures existing data is not accidentally overwritten by new scrapes
 
     Parameters
     ----------
-    index : int
-        Looping index from 0, starting over each search, to ensure UNIQUE digits are assigned
-
-    Returns
-    -------
-    outfile : str
-        Contains the name of the file where the object will be saved
+    path : str
+        Path to the save location for scraped data
 
     Notes
     -----
-    - All outfiles will be four digit numbers, with zeros at the start for shorter numbers
-        - E.g. The fourteenth object saved will be saved at '0013.json' (indexed from '0000')
+    - The yes/no check runs for every file because of the loop in scripts - I just want it to run once
     """
+    overwrite = input('You may be overwriting saved data. Continue? (y/n) \n > ')
 
-    # New variable to create a string outfile name
-    i = str(index)
+    # If the user does want to overwrite data, temporary archive existing data and empty the directory
+    if overwrite == 'y':
+        
+        # Create temporary archive
+        archive = os.path.join('Data', 'Archive')
 
-    # Generate the proper number of zeros, given the index
-    zeros = '0' * (4 - len(i))
+        # Archive and delete files
+        for file in os.listdir(path):
+            file_path = os.path.join(path, file)
+            
+            # Copy the db contents into the temporary archive
+            copy2(file_path, archive)
 
-    # Join the zeros before the index to create the save ID
-    id = zeros + i
+            # Delete all files in the directory where new data will be saved
+            os.unlink(file_path)
+    
+    # If user does not want to overwrite data, raise an error and quit
+    elif overwrite =='n':
+        raise RuntimeError('Save function quit to avoid overwriting existing data')
 
-    # Save in JSON file format
-    outfile = id + '.json'
 
-    return(outfile)
+def clear_archive():
+    """Deletes all archived files"""
+
+    # Create the path to the saved data archive
+    archive = os.path.join('Data', 'Archive')
+
+    # Delete all files in the archive
+    for file in os.listdir(archive):
+        file_path = os.path.join(archive, file)
+        os.unlink(file_path)
 
 
-def save(data_type, search_term, data, outfile):
+def save(path, outfile, data):
     """Saves data from paper or press release object to JSON
 
     Parameters
     ----------
-    data_type : str
-        Type of data (Paper or Press_Release) to be saved
-    search_term : str
-        PubMed search term (papers) or government database (press releases) used to find the given info
-    data : Paper object or Press_Release object
-        Extracted info from the paper or press release
+    path : str
+        Path to the desired save location by data type and search term
     outfile : str
         Filename associated with a given paper for organizational purposes
+    data : Paper object or Press_Release object
+        Extracted info from the paper or press release
     """
 
-    # Get the directory to save the data in
-    directory = build_path(data_type, search_term)
-
     # Build the path for the individual file to be saved at
-    path = os.path.join(directory, outfile)
+    file_path = os.path.join(path, outfile)
 
     # Convert our information into a savable dictionary format
     info_dict = data.__dict__()
 
     # Save information to the path generated, each entry on its own line
-    with open(path, 'w') as outfile:
+    with open(file_path, 'w') as outfile:
         json.dump(info_dict, outfile)
 
 
@@ -124,19 +137,19 @@ def load_folder(data_type, search_term, root_dir='Data/'):
 
     # List all files in the directory
     files = os.listdir(directory)
-    print(files)
+
+    # Remove hidden files from the directory (if present)
+    files = [f for f in files if f[0] is not '.']
 
     # Initialize a list to store the paper or press release objects generated
     items = []
 
     # Go through directory, loading each file into an individual object, append to items
-    if data_type == 'Papers':
-        for file in files:
-            path = os.path.join(directory, file)
+    for file in files:
+        path = os.path.join(directory, file)
+        if data_type == 'Papers':
             items.append(load_paper_json(path))
-    elif data_type == 'PRs':
-        for file in files:
-            path = os.path.join(directory, file)
+        elif data_type == 'PRs':
             items.append(load_pr_json(path))
 
     return(items)
@@ -154,10 +167,6 @@ def load_paper_json(path):
     -------
     paper : Paper object
         Paper object with attributes populated from the JSON file
-
-    Notes
-    -----
-    - Not sure whether I should be using json.load or json.loads here
     """
 
     # Retrieve the JSON file
@@ -188,10 +197,6 @@ def load_pr_json(path):
     -------
     pr : Press_Release object
         Press_Release object with attributes populated from the JSON file
-
-    Notes
-    -----
-    - Not sure whether I should be using json.load or json.loads here
     """
 
     # Retrieve the JSON file
