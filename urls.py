@@ -63,6 +63,15 @@ def build_fetch(uid, use_hist=False, retmode="retmode=xml", db="db=pubmed"):
     return fetch
 
 
+def build_info(db='db=pubmed', retmode='retmode=xml'):
+    """Function for finding database info using NCBI's EInfo call"""
+    
+    info_base = base_url + 'einfo.fcgi?'
+    info = info_base + db + '&' + retmode
+
+    return info
+
+
 def get_ids(search_url):
     """Extract all paper IDs from PubMed search
 
@@ -134,6 +143,7 @@ def use_history():
     -----
     - Un-tested, not totally sure if it works yet, must integrate with rest of code as well
     - Not sure whether to use scrape_data() function or extract_add_info()?
+    - Also have to finish finding the article url. Figure out how to search with use_hist on
     """
 
     papers = []
