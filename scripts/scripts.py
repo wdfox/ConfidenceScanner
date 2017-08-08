@@ -1,11 +1,15 @@
-
-"""Functions designed to collect all data starting with a single search term/database pairing"""
+'''Functions designed to collect all data starting with a single search term/database pairing'''
 
 import base
 import urls
 import data
+from requester import Requester
 
-def collect_papers(paper_count, search_term):
+import os
+
+
+
+def collect_papers(paper_count, search_term, use_hist=False):
     """Collects a given number of papers related to a given term
 
     Parameters
@@ -14,32 +18,58 @@ def collect_papers(paper_count, search_term):
         Number of papers to be collected and saved
     search_term : str
         Papers returned will be associated with this term
+    use_hist : Bool
+        Whether to employ the EUtils use_history feature for large scrapes
 
     Notes
     -----
-    - Currently this function overwrites the existing file every time it runs - Must fix
-    - Perhaps worth checking if a paper with a given ID is already in saved data? Or just scrape new file every time?
+    - Decide between a temp file or archive
     """
 
-    # Build search URL
-    search = urls.build_search(search_term, retmax=paper_count)
-    # Get associated IDs
-    ids = urls.get_ids(search)
+    req = Requester()
 
-    # Create a list of paper objects to be saved
-    papers = [base.Paper(id) for id in ids]
+    # Create a location to save the collected papers
+    path = data.build_path(data_type='Papers', search_term=search_term)
 
-    # Initialize an index to be used in saving the papers
-    i = 0
+    # Save a header file with the database info
+    # urls.save_db_info(path)
 
-    # Extract the desired info from each paper and save to JSON
-    for paper in papers:
-        paper.scrape_data()
-        outfile = data.assign_outfile(i)
-        data.save('Papers', search_term, paper, outfile)
+    # Using history
+    if use_hist:
 
-        # Increment the index to save the next paper
-        i += 1
+        ret_start = 0
+        ret_max = 100
+
+        count = int(page_soup.find('count').text)
+        web_env = page_soup.find('webenv').text
+        query_key = page_soup.find('querykey').text
+
+        while ret_start < count:
+
+            art_url = None# FIGURE THIS OUT
+            
+            # Scrape and save data for each article into JSON
+            data.scrape_paper_data(art_url, path, ret_start)
+
+            # Increment ret_start to get next batch of papers
+            ret_start += ret_max
+
+    else:
+
+        # Build search URL
+        search = urls.build_search(search_term, retmax=paper_count)
+        
+        # Get associated IDs
+        ids = urls.get_ids(search)
+
+        # Get the fetch URL for papers
+        art_url = urls.build_fetch(ids)
+
+        # Scrape and save data for each article into JSON
+        data.scrape_paper_data(art_url, path)
+
+    # Clear archived data after a successful scrape
+    data.clear_archive()
 
 
 def collect_prs(pr_count, db_url="https://www.nih.gov/news-events/news-releases"):
@@ -55,6 +85,7 @@ def collect_prs(pr_count, db_url="https://www.nih.gov/news-events/news-releases"
     Notes
     -----
     - Currently this function overwrites the existing file every time it runs
+    - Implement the whole save path deal as above
     """
 
     # Retrieve press release URLS
@@ -70,7 +101,7 @@ def collect_prs(pr_count, db_url="https://www.nih.gov/news-events/news-releases"
     i = 0
 
     # Extract the desired info from each press release and save to JSON
-    for pr in prs:
+    for ind, pr in enumerate(prs):
         pr.scrape_data()
-        outfile = data.assign_outfile(i)
-        data.save('PRs', db_url, pr, outfile)
+        outfile = '{:04d}.json'.format(ind)
+        data.save(path, outfile, pr)
