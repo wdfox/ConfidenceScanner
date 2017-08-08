@@ -17,6 +17,8 @@ def build_search(search_term, retmax, use_hist=False, db="db=pubmed"):
         Paper ids found will have association with this search term
     retmax : str
         Number of paper ids to be returned
+    use_hist : Bool
+        Whether to employ the EUtils use_history feature for large scrapes
     db : str
         Specify the database to search (preset as PubMed)
 
@@ -29,19 +31,27 @@ def build_search(search_term, retmax, use_hist=False, db="db=pubmed"):
     -----
     - Search built according to the PubMed URL API
     """
+
+    # Convert use_hist boolean into str form
+    if use_hist:
+        use_hist = "usehistory=y"
+    else:
+        use_hist = ""
+
+    # Join all parts of the URL into a usable search
     search_base = base_url + "esearch.fcgi?"
-    search = search_base + db + "&" + "term=" + search_term + "&" + "retmax=" + retmax
+    search = search_base + db + "&term=" + search_term + use_hist + "&retmax=" + retmax
 
     return search
 
 
-def build_fetch(uid, use_hist=False, retmode="retmode=xml", db="db=pubmed"):
-    """Function for finding a specific paper given its ID
+def build_fetch(ids, use_hist=False, retmode="xml", db="db=pubmed"):
+    """Function for finding specific papers given their IDs
 
     Parameters
     ----------
-    uid : str
-        ID number of the paper to retrieve
+    ids : list
+        ID numbers of the papers to retrieve
     retmode : str
         Format the paper is returned in (preset as XML)
     db : str
@@ -58,7 +68,11 @@ def build_fetch(uid, use_hist=False, retmode="retmode=xml", db="db=pubmed"):
     """
 
     fetch_base = base_url + "efetch.fcgi?"
-    fetch = fetch_base + db + "&" + retmode + "&" + "id=" + uid
+    # fetch = fetch_base + db + "&" + retmode + "&id=" + ids
+
+    ids_str = ','.join(ids)
+
+    fetch = fetch_base + db + "&retmode=" + retmode + "&id=" + ids_str
 
     return fetch
 
@@ -70,6 +84,40 @@ def build_info(db='db=pubmed', retmode='retmode=xml'):
     info = info_base + db + '&' + retmode
 
     return info
+
+
+def save_db_info(save_location):
+    """Saves a header file with the database info for a given scrape
+
+    Parameters
+    ----------
+    save_location : str
+        Path to the save location for a given scrape
+    """
+
+    # Initialize a requester object to handle URL calls
+    req = Requester()
+
+    # Get the URL for the database EInfo call
+    info_url = build_info()
+    page = req.get_url(info_url)
+
+    # More convenient form for extraction
+    page_soup = BeautifulSoup(page.content, 'lxml')
+
+    # Initialize a dictionary to store relevant info
+    db_info = {}
+
+    # Extract info from the webpage
+    db_info['db_name'] = page_soup.DbInfo.MenuName.text
+    db_info['description'] = page_soup.DbInfo.Description.text
+    db_info['build'] = page_soup.DbInfo.DbBuild.text
+    db_info['last update'] = page_soup.DbInfo.LastUpdate.text
+
+    save_location = os.path.join(path, 'db_info.json')
+
+    with open(save_location, 'w') as header_file:
+        json.dump(db_info, header_file)
 
 
 def get_ids(search_url):
@@ -129,55 +177,6 @@ def ids_to_str(ids):
         str_ids.append(uid[4:-5])
 
     return str_ids
-
-
-def use_history():
-    """Handles large paper calls with NCBI Use History
-
-    Returns
-    -------
-    papers : list of Paper objects
-        List of paper objects collected in the database search
-
-    Notes
-    -----
-    - Un-tested, not totally sure if it works yet, must integrate with rest of code as well
-    - Not sure whether to use scrape_data() function or extract_add_info()?
-    - Also have to finish finding the article url. Figure out how to search with use_hist on
-    """
-
-    papers = []
-
-    ret_start = 0
-    ret_max = 100
-
-    count = int(page_soup.find('count').text)
-    web_env = page_soup.find('webenv').text
-    query_key = page_soup.find('querykey').text
-
-    while ret_start < count:
-
-        art_url = # FIGURE THIS OUT
-        art_page = self.req.get_url(art_url)
-        page_soup = BeautifulSoup(art_page.content, 'lxml')
-
-        # Pull out articles
-        articles = page_soup.find_all('PubmedArticle')
-
-        # Loop through articles
-        for article in articles:
-
-            # For each article, pull the ID and extract relevant info
-            paper = base.Paper(article.find('id'))
-            # paper.scrape_data() OR paper.extract_add_info()?
-
-            # Add each paper to the list to be returned
-            papers.append(paper)
-
-        # Increment ret_start to get next batch of papers
-        ret_start += ret_max
-
-    return(papers)
 
 
 def crawl(start_url, page_number=0, pr_links=list()):
@@ -268,15 +267,3 @@ db_terms = {
             'https://www.niams.nih.gov/News_and_Events/': 'arthritis, skin diseases', 
             'https://www.nibib.nih.gov/news-events/newsroom?news-type=29&health-terms=All&pub-date%5Bvalue%5D%5Byear%5D=': 'bioengineering'
             }
-
-
-
-""" Control Flow:
-
-    1) Pick a search term
-    2) Get a number of paper ids associated with that term
-    3) Loop through ids, cleaning and saving the information from each paper to a new object
-    4) Then deal with the data/Analyze
-	
-
-    """
