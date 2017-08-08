@@ -3,8 +3,51 @@
 import base
 import json
 import os
+import datetime
+from requester import Requester
 
+from bs4 import BeautifulSoup
 from shutil import copy2
+
+def scrape_paper_data(url, path, ret_start=0):
+    """Retrieve the paper from PubMed and extract the info.
+
+    Parameters
+    ----------
+    url : str
+        Fetch URL for the desired papers
+    path : str
+        Path to the save location for scraped data
+    ret_start : int
+        An integer for keeping track of the saving index (so papers don't get saved over others if using history)
+    """
+
+    req = Requester()
+
+    # Use Requester() object to open the paper URL
+    art_page = req.get_url(url)
+
+    # Get paper into a more convenient format for info extraction
+    page_soup = BeautifulSoup(art_page.content, 'lxml')
+
+    # Pull out articles
+    articles = page_soup.find_all('pubmedarticle')
+
+    # Loop through articles
+    for ind, article in enumerate(articles):
+
+        # For each article, pull the ID and extract relevant info
+        art_id = article.find('articleid', idtype='pubmed').text
+        paper = base.Paper(art_id)
+        paper.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        paper.extract_add_info(article)
+
+        # Save paper object to JSON file
+        outfile = '{:04d}.json'.format(ind+ret_start)
+        save(path, outfile, paper)
+
+    # Close the URL request
+    req.close()
 
 
 def build_path(data_type, search_term, root_dir='Data/'):
@@ -50,6 +93,7 @@ def clear_db(path):
     Notes
     -----
     - The yes/no check runs for every file because of the loop in scripts - I just want it to run once
+    - Implement either an else statement to raise error or throw in a while loop
     """
     overwrite = input('You may be overwriting saved data. Continue? (y/n) \n > ')
 
@@ -72,6 +116,10 @@ def clear_db(path):
     # If user does not want to overwrite data, raise an error and quit
     elif overwrite =='n':
         raise RuntimeError('Save function quit to avoid overwriting existing data')
+
+    # If user enters any other characters, show the prompt again
+    else:
+        clear_db(path)
 
 
 def clear_archive():
@@ -175,6 +223,7 @@ def load_paper_json(path):
 
     # Populate the paper attributes
     paper = base.Paper(info_dict['id'])
+    paper.doi = info_dict['title']
     paper.title = info_dict['title']
     paper.authors = info_dict['authors']
     paper.journal = info_dict['journal']
