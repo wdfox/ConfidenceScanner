@@ -70,11 +70,6 @@ class Base(object):
 
         Notes
         -----
-        - Perhaps we could use NLTK sentiment analyzer and train it on data sets from Sumner or other people
-        - Demo liu hu lexicon?
-        - Demo subjectivity? by Pang and Lee?
-        - Consider using VADER? Must cite the authors
-        - Biggest problems for NLTK seem to be when the writing has a strange context (ironic, sarcastic) which shouldn't be an issue for us
         - What if we trained an algorithm on papers and prs and then had it try to sort unknown texts into one of the categories and see if it can?
         - Maybe consider not tokenizing by words, but by sentence or phrase as well?
         - Linguistic Inquiry and Work Count (LIWC) -- (http://liwc.wpengine.com)
@@ -88,7 +83,14 @@ class Base(object):
         - python textblob library maybe?
 
         """
-        pass
+        classification = nltk.sentiment.util.demo_liu_hu_lexicon(self.text)
+        print(classification)
+
+        subjectivity = nltk.sentiment.util.demo_sent_subjectivity(self.text)
+        print(subjectivity)
+
+        VADER = nltk.sentiment.util.demo_vader_instance(self.text)
+        print(VADER)
 
 
 
@@ -132,8 +134,9 @@ class Paper(Base):
         # Initialize to store all of the basic data
         Base.__init__(self)
 
-        # Set ID attribute to the given ID
+        # Set ID attribute to the given PubMed ID and paper DOI
         self.id = id
+        self.doi = str()
 
         # Initialize to store the paper authors and publishing journal
         self.authors = list()
@@ -145,6 +148,7 @@ class Paper(Base):
 
         return {
                 'id' : self.id,
+                'doi' : self.doi,
                 'title' : self.title,
                 'text' : self.text,
                 'authors' : self.authors,
@@ -168,34 +172,15 @@ class Paper(Base):
         """
 
         # Set attributes to be the extracted info from PubMed article.
+        self.doi = article.find('articleid', idtype='doi').text
         self.title = article.articletitle.text
         self.authors = _process_authors(article.authorlist)
-        self.journal = article.title.text, article.isoabbreviation.text
+        self.journal = _check_extract(article, 'title'), _check_extract(article, 'isoabbreviation')
+        # self.journal = article.title.text, article.isoabbreviation.text
         self.text = process_paper(article.abstracttext.text)
         self.year = int(article.datecreated.year.text)
 
-
-    def scrape_data(self):
-        """Retrieve the paper from PubMed and extract the info."""
-
-        # Set date of when data was collected
-        self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-
-        # Fetches paper with a given ID from PubMed
-        fetch_url = urls.build_fetch(self.id)
-
-        # Use Requester() object to open the paper URL
-        article = self.req.get_url(fetch_url)
-
-        # Get paper into a more convenient format for info extraction
-        article_soup = BeautifulSoup(article.content, 'lxml')
-
-        self.extract_add_info(article_soup)
-
-        # Close the URL request
-        self.req.close()
-
-        # Ensure all attributes are of the correct type
+        # Ensure all attributes are of correct type
         self._check_type()
 
 
@@ -203,6 +188,7 @@ class Paper(Base):
         """Ensures all attributes are of the correct type."""
 
         assert isinstance(self.id, str)
+        assert isinstance(self.doi, str)
         assert isinstance(self.title, str)
         assert isinstance(self.authors, list)
         assert isinstance(self.journal, tuple)
