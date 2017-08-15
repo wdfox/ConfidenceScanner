@@ -176,7 +176,6 @@ class Paper(Base):
         self.title = article.articletitle.text
         self.authors = _process_authors(article.authorlist)
         self.journal = _check_extract(article, 'title'), _check_extract(article, 'isoabbreviation')
-        # self.journal = article.title.text, article.isoabbreviation.text
         self.text = process_paper(article.abstracttext.text)
         self.year = int(article.datecreated.year.text)
 
@@ -274,31 +273,10 @@ class Press_Release(Base):
         """
 
         # Set attributes to be the extracted info from press release.
-        self.title = article.title.text
+        self.title = article.find('meta', property='og:title')['content']
         self.source = article.find('meta', property='og:site_name')['content']
         self.text = process_pr(article)
         self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
-
-
-    def scrape_data(self):
-        """Retrieve the press release and extract the info."""
-
-        # Set the date of when the data was collected
-        self.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-
-        # Use Requester() object to open the paper URL
-        article = self.req.get_url(self.url)
-
-        # Get paper into a more convenient format for extraction
-        pr_soup = BeautifulSoup(article.content, "lxml")
-
-        self.extract_add_info(pr_soup)
-
-        # Close the URL request
-        self.req.close()
-
-        # Ensure all attributes are of the correct type
-        self._check_type()
 
 
     def _check_type(self):
@@ -388,11 +366,10 @@ def process_pr(article):
     
     for tag in tags:
         tag = tag.get_text()
-        # Heuristic for eliminating excess text that is unrelated to the articlem -- another possibility is 'Article:'
-        if tag[0:9] != 'About the':
-            text += tag
-        else:
+        # Heuristic for eliminating excess text that is unrelated to the article
+        if tag == '###':
             break
+        text += tag
 
     # Tokenize the input text
     words = nltk.word_tokenize(text)
