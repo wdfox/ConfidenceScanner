@@ -34,7 +34,7 @@ def build_search(search_term, retmax, use_hist=False, db="db=pubmed"):
 
     # Convert use_hist boolean into str form
     if use_hist:
-        use_hist = "usehistory=y"
+        use_hist = "&usehistory=y"
     else:
         use_hist = ""
 
@@ -45,13 +45,23 @@ def build_search(search_term, retmax, use_hist=False, db="db=pubmed"):
     return search
 
 
-def build_fetch(ids, use_hist=False, retmode="xml", db="db=pubmed"):
+def build_fetch(ids, use_hist=False, query_key=None, WebEnv=None, retstart=None, retmax=None, retmode="&retmode=xml", db="db=pubmed"):
     """Function for finding specific papers given their IDs
 
     Parameters
     ----------
     ids : list
         ID numbers of the papers to retrieve
+    use_hist: Bool
+
+    query_key : str
+
+    WebEnv : str
+
+    retstart : int
+
+    retmax : int
+
     retmode : str
         Format the paper is returned in (preset as XML)
     db : str
@@ -67,12 +77,22 @@ def build_fetch(ids, use_hist=False, retmode="xml", db="db=pubmed"):
     - Fetch built according the specifications of the PubMed URL API
     """
 
-    fetch_base = base_url + "efetch.fcgi?"
-    # fetch = fetch_base + db + "&" + retmode + "&id=" + ids
+    fetch_base = base_url + 'efetch.fcgi?'
 
-    ids_str = ','.join(ids)
+    if use_hist:
 
-    fetch = fetch_base + db + "&retmode=" + retmode + "&id=" + ids_str
+        if query_key is None or WebEnv is None or retstart is None or retmax is None:
+            raise Exception('Must specify query_key, WebEnv, retstart, and retmax if using history')
+
+        else: 
+
+            fetch = fetch_base + db + '&query_key=' + query_key + '&WebEnv=' + WebEnv + retmode + '&retstart=' + str(retstart) + '&retmax=' + str(retmax)
+
+    elif not use_hist:
+
+        ids_str = ','.join(ids)
+
+        fetch = fetch_base + db + retmode + "&id=" + ids_str
 
     return fetch
 
@@ -177,6 +197,33 @@ def ids_to_str(ids):
         str_ids.append(uid[4:-5])
 
     return str_ids
+
+
+def get_use_hist(search_url):
+    """Extract all necessary info for a PubMed paper search using history
+
+    Parameters
+    ----------
+    search_url : str
+        URL from build_search() function to a list of IDs associated with a given term
+
+    Returns
+    -------
+
+    """
+
+    # Use requester to opent the search url
+    req = Requester()
+    page = req.get_url(search_url)
+
+    # Use BeatifulSoup to convert webpage into a more convenient form for extraction
+    page_soup = BeautifulSoup(page.content, "lxml")
+
+    count = int(page_soup.find('count').text)
+    query_key = page_soup.find('querykey').text
+    WebEnv = page_soup.find('webenv').text
+
+    return count, query_key, WebEnv
 
 
 def crawl(start_url, page_number=0, pr_links=list()):
