@@ -37,22 +37,27 @@ def collect_papers(paper_count, search_term, use_hist=False):
     # Using history
     if use_hist:
 
-        ret_start = 0
-        ret_max = 100
+        retstart = 0
+        retmax = 10
 
-        count = int(page_soup.find('count').text)
-        web_env = page_soup.find('webenv').text
-        query_key = page_soup.find('querykey').text
+        search = urls.build_search(search_term, retmax=paper_count, use_hist=True)
 
-        while ret_start < count:
+        use_hist_info = urls.get_use_hist(search)
 
-            art_url = None# FIGURE THIS OUT
-            
+        count = use_hist_info[0]
+        query_key = use_hist_info[1]
+        WebEnv = use_hist_info[2]
+
+        while retstart < int(paper_count):
+
+            art_url = urls.build_fetch(ids=None, use_hist=True, query_key=query_key, WebEnv=WebEnv, retstart=retstart, retmax=retmax)
+            print(art_url)
+
             # Scrape and save data for each article into JSON
-            data.scrape_paper_data(art_url, path, ret_start)
+            data.scrape_paper_data(art_url, path, retstart)
 
             # Increment ret_start to get next batch of papers
-            ret_start += ret_max
+            retstart += retmax
 
     else:
 
@@ -72,7 +77,7 @@ def collect_papers(paper_count, search_term, use_hist=False):
     data.clear_archive()
 
 
-def collect_prs(pr_count, db_url="https://www.nih.gov/news-events/news-releases"):
+def collect_prs(pr_count, db_url=None):
     """Collects a given number of press releases related to a given term
 
     Parameters
@@ -88,6 +93,9 @@ def collect_prs(pr_count, db_url="https://www.nih.gov/news-events/news-releases"
     - Implement the whole save path deal as above
     """
 
+    # Create a location to save the collected papers
+    path = data.build_path(data_type='PRs', search_term=db_url)
+
     # Retrieve press release URLS
     pr_links = urls.crawl(db_url)
 
@@ -95,13 +103,13 @@ def collect_prs(pr_count, db_url="https://www.nih.gov/news-events/news-releases"
     prs = []
     for link in pr_links:
         if len(prs) < pr_count:
-            prs.append(base.Press_Release(db_url+link))
+            prs.append(db_url+link)
 
     # Initialize an index to be used in saving the papers
     i = 0
 
     # Extract the desired info from each press release and save to JSON
-    for ind, pr in enumerate(prs):
-        pr.scrape_data()
+    for ind, url in enumerate(prs):
+        pr = scrape_pr_data(url, path)
         outfile = '{:04d}.json'.format(ind)
         data.save(path, outfile, pr)
