@@ -9,7 +9,7 @@ from requester import Requester
 from bs4 import BeautifulSoup
 from shutil import copy2
 
-def scrape_paper_data(url, path, ret_start=0):
+def scrape_paper_data(url, path, retstart=0):
     """Retrieve the paper from PubMed and extract the info.
 
     Parameters
@@ -22,6 +22,7 @@ def scrape_paper_data(url, path, ret_start=0):
         An integer for keeping track of the saving index (so papers don't get saved over others if using history)
     """
 
+    # Initialize Requester object for URL requests
     req = Requester()
 
     # Use Requester() object to open the paper URL
@@ -42,12 +43,50 @@ def scrape_paper_data(url, path, ret_start=0):
         paper.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         paper.extract_add_info(article)
 
+        # Ensure all attributes are of the correct type
+        paper._check_type()
+
         # Save paper object to JSON file
-        outfile = '{:04d}.json'.format(ind+ret_start)
+        outfile = '{:04d}.json'.format(ind+retstart)
         save(path, outfile, paper)
 
     # Close the URL request
     req.close()
+
+
+def scrape_pr_data(url, path):
+    """Retrieve the press release from Eurekalert and extract the info.
+
+    Parameters
+    ----------
+    url : str
+        Fetch URL for the desired press release
+    path : str
+        Path to the save location for scraped data
+    """
+
+    # Initialize Requester object for URL requests
+    req = Requester()
+
+    # Use Requester() to open the press release URL
+    art_page = req.get_url(url)
+
+    # Get press release into a more convenient format for info extraction
+    page_soup = BeautifulSoup(art_page.content, 'lxml')
+    print(page_soup)
+
+    # Initialize a press release object to store the scraped data and extract info
+    pr = Press_Release(url)
+    pr.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    pr.extract_add_info()
+
+    # Close the URL request
+    req.close()
+
+    # Ensure all attributes are of the correct type
+    pr._check_type()
+
+    return(pr)
 
 
 def build_path(data_type, search_term, root_dir='Data/'):
@@ -92,8 +131,6 @@ def clear_db(path):
 
     Notes
     -----
-    - The yes/no check runs for every file because of the loop in scripts - I just want it to run once
-    - Implement either an else statement to raise error or throw in a while loop
     """
     overwrite = input('You may be overwriting saved data. Continue? (y/n) \n > ')
 
