@@ -223,8 +223,9 @@ def load_folder(data_type, search_term, root_dir='Data/'):
     # List all files in the directory
     files = os.listdir(directory)
 
-    # Remove hidden files from the directory (if present)
-    files = [f for f in files if f[0] is not '.']
+    # Remove hidden files from the directory (if present) and db_info file, leaving only paper or pr files
+    # files = [f for f in files if f[0] is not '.']
+    files = [f for f in files if f[0] in '0123456789']
 
     # Initialize a list to store the paper or press release objects generated
     items = []
@@ -233,9 +234,15 @@ def load_folder(data_type, search_term, root_dir='Data/'):
     for file in files:
         path = os.path.join(directory, file)
         if data_type == 'Papers':
-            items.append(load_paper_json(path))
+            paper = load_paper_json(path)
+            if isinstance(paper.text, list):
+                items.append(paper)
         elif data_type == 'PRs':
-            items.append(load_pr_json(path))
+            pr = load_pr_json(path)
+            items.append(pr)
+
+    # Filter out papers with no abstract text, redundant with above inside loop isinstance call
+    items = [items for paper in items if paper.text not None]
 
     return(items)
 
@@ -260,7 +267,7 @@ def load_paper_json(path):
 
     # Populate the paper attributes
     paper = base.Paper(info_dict['id'])
-    paper.doi = info_dict['title']
+    paper.doi = info_dict['doi']
     paper.title = info_dict['title']
     paper.authors = info_dict['authors']
     paper.journal = info_dict['journal']
