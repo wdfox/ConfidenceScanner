@@ -173,10 +173,13 @@ class Paper(Base):
 
         # Set attributes to be the extracted info from PubMed article.
         self.doi = article.find('articleid', idtype='doi').text
-        self.title = article.articletitle.text
+        # self.title = article.articletitle.text
+        self.title = _check_extract(article, 'articletitle')
         self.authors = _process_authors(article.authorlist)
         self.journal = _check_extract(article, 'title'), _check_extract(article, 'isoabbreviation')
-        self.text = process_paper(article.abstracttext.text)
+        # self.text = _process_paper(article.abstracttext.text)
+        # self.text = _process_paper(_check_extract(article, 'abstracttext'))
+        self.text = _process_paper(article.find_all('abstracttext'))
         self.year = int(article.datecreated.year.text)
 
         # Ensure all attributes are of correct type
@@ -275,7 +278,7 @@ class Press_Release(Base):
         # Set attributes to be the extracted info from press release.
         self.title = article.find('meta', property='og:title')['content']
         self.source = article.find('meta', property='og:site_name')['content']
-        self.text = process_pr(article)
+        self.text = _process_pr(article)
         self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
 
 
@@ -318,13 +321,13 @@ def CatchNone(func):
 #########################################################################
 
 @CatchNone
-def process_paper(abstract):
+def _process_paper(abstract_tags):
     """Sets abstract text to lower case, removes stopwords and punctuation.
 
     Parameters
     ----------
-    abstract : str
-        Text as one long string.
+    abstract_tags : ResultSet
+        Tags from original article denoting all or part of an abstract
 
     Returns
     -------
@@ -332,8 +335,15 @@ def process_paper(abstract):
         List of words, after processing.
     """
 
+    # Initialize a variable to store the abstract text
+    abstract_text = ''
+
+    # Loop through selected tags, combining all pieces of abstract text
+    for tag in abstract_tags:
+        abstract_text += tag.get_text()
+
     # Tokenize input text
-    words = nltk.word_tokenize(abstract)
+    words = nltk.word_tokenize(abstract_text)
 
     # Remove stop words, and non-alphabetical tokens (punctuation).
     return [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
@@ -341,7 +351,7 @@ def process_paper(abstract):
 
 
 @CatchNone
-def process_pr(article):
+def _process_pr(article):
     """Set pr text to lower case, removes stopwords and punctuation.
 
     Parameters
