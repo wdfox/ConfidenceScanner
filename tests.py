@@ -1,33 +1,121 @@
+'''Test cases for Com_Scanner classes and functions'''
 
 import base
 import requester
 import urls
+import data
 from scripts.scripts import collect_papers, collect_prs
+
+from bs4 import BeautifulSoup
+
 
 """ Tests for scraping """
 
-# PubMed
+##############
+### PubMed ###
+##############
+
+
+### Single ID Check ###
+
+# ids = ['28800331']
+# print(type(ids))
+
+# fetch = urls.build_fetch(ids)
+# print(fetch)
+
+# paper = base.Paper('28800331')
+# req = requester.Requester()
+# # Use Requester() object to open the paper URL
+# art_page = req.get_url(fetch)
+
+# # Get paper into a more convenient format for info extraction
+# page_soup = BeautifulSoup(art_page.content, 'lxml')
+
+# # Pull out articles
+# articles = page_soup.find_all('pubmedarticle')
+# paper.extract_add_info(articles[0])
+# print(paper.text)
+
+
+### E-Info ###
+
+# einfo = urls.build_info()
+# print(einfo)
+
+# # Initialize a requester object to handle URL calls
+# req = requester.Requester()
+
+# # Get the URL for the database EInfo call
+# page = req.get_url(einfo)
+
+# # More convenient form for extraction
+# page_soup = BeautifulSoup(page.content, 'lxml')
+
+# print(page_soup.dbname.text)
+
+
+### Search, Fetch, and Extract ###
 
 # search = urls.build_search("aging", '3')
 # ids = urls.get_ids(search)
 # print(ids)
 
-# fetch = urls.build_fetch(ids[0])
+# fetch = urls.build_fetch(ids)
 # print(fetch)
 
-# paper = base.Paper(ids[0])
+# paper = base.Paper(ids[1])
 # print("Paper id is", paper.id)
 
 # paper.scrape_data()
+# print("Paper doi is", paper.doi)
 # print("Paper title is", paper.title)
 # print("Paper author(s):", paper.authors)
 # print("Paper journal:", paper.journal)
 # print("Paper year:", paper.year)
 # print("Paper abstract: \n", paper.text)
 
+# info_dict = paper.__dict__()
+# print(type(info_dict))
+# print(info_dict)
 
 
-# NIH Database
+###################
+### Use History ###
+###################
+
+# search = urls.build_search('aging', '3', use_hist=True)
+# print(search)
+# info = urls.get_use_hist(search)
+# print(info)
+
+# collect_papers(paper_count='3', search_term='aging', use_hist=True)
+
+
+###################
+### EurekAlert! ###
+###################
+
+# data.scrape_pr_data(url='https://www.eurekalert.org/pub_releases/2017-08/uoc--lbb080817.php', path=None)
+
+
+################
+### Analysis ###
+################
+# search = urls.build_search('aging', '1')
+# ids = urls.get_ids(search)
+# print(ids)
+# fetch = urls.build_fetch(ids)
+# print(fetch)
+
+# paper = base.Paper(ids[0])
+# paper.scrape_data()
+# paper.analyze()
+
+
+####################
+### NIH Database ###
+####################
 
 # pr = base.Press_Release("https://www.nih.gov/news-events/news-releases/pregnancy-diet-high-refined-grains-could-increase-child-obesity-risk-age-7-nih-study-suggests")
 
@@ -38,41 +126,49 @@ from scripts.scripts import collect_papers, collect_prs
 # print("PR content:\n", pr.text)
 
 
-# NIH Crawler
+###################
+### NIH Crawler ###
+###################
 
 # urls.crawl("https://www.nih.gov/news-events/news-releases")
 
 
-# Paper and PR Mass collection
+####################################
+### Paper and PR Mass collection ###
+####################################
 
 # papers = collect_papers(paper_count='3', search_term='aging')
 # prs = collect_prs(pr_count='10', db_url="https://www.nih.gov/news-events/news-releases")
 
 
+################################
+### Save and Load Procedures ###
+################################
+
+# outfile = data.assign_outfile(index=0)
+# print(outfile)
+
+# paper_path = data.build_path('Papers', 'aging') + '/0001.json'
+# paper = data.load_paper_json(paper_path)
+# print(paper.id)
+
+paper_list = data.load_folder('Papers', 'aging')
+print(paper_list)
 
 
 
 
 """
-test for funny characters using this article 'https://www.nih.gov/news-events/news-releases/researchers-aim-repurpose-former-experimental-cancer-therapy-treat-muscular-dystrophy'
-and paper with url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&id=28609678'
-
-
-save in json (use dictionary) --> look at erp_data.py for save and load methods
 
 NOTES:
-- Funny characters just seemed to get passed in and parsed like normal. Any use in removing them? Would this affect normalizing for length?
 - Other study only looked at MAIN causal claims--but what if the text later works to caveat the main claim?
 
 
-
-TO DO:
-
-1) Save and load scraped info in json files (getting there)
-2) Create method for analysis (perhaps check out nltk.sentiment package)
-3) Create run script for mass paper collection (just need to test it out and work on saving)
-4) Test crawl function (should be able to find 357 pages, but stops after 13)
-5) Create run script for mass pr collection (should work once saving gets figured out)
-6) Journal press releases versus university versus national institute?
+Read 2014 Sumner Paper and anything from reference list on Tom's paper by relevance
+Look at Google Scholar for relevant papers maybe?
+Read papers from tom
+Try out sentiment analysis (out of the box nltk) try using a jupyter notebook (scores for text difficulty, sentiment, etc.) maybe textblob
+PR Scraping
+What kinds of analysis to run
 
 """
