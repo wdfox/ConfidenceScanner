@@ -6,6 +6,7 @@ import urls
 import data
 from scripts.scripts import collect_papers, collect_prs
 
+import datetime
 from bs4 import BeautifulSoup
 
 
@@ -97,6 +98,12 @@ from bs4 import BeautifulSoup
 ###################
 
 # data.scrape_pr_data(url='https://www.eurekalert.org/pub_releases/2017-08/uoc--lbb080817.php', path=None)
+# data.scrape_pr_data(url='https://www.eurekalert.org/pub_releases/2017-11/brf-sfn112817.php', path=None)
+
+end_date = datetime.date.today()
+start_date = end_date.replace(day=end_date.day-6)
+
+collect_prs(search_term='aging', start_date=start_date, end_date=end_date)
 
 
 ################
@@ -130,7 +137,7 @@ from bs4 import BeautifulSoup
 ### NIH Crawler ###
 ###################
 
-# urls.crawl("https://www.nih.gov/news-events/news-releases")
+# urls.crawl(search_term='aging', start_date=None, end_date=None)
 
 
 ####################################
@@ -152,8 +159,8 @@ from bs4 import BeautifulSoup
 # paper = data.load_paper_json(paper_path)
 # print(paper.id)
 
-paper_list = data.load_folder('Papers', 'aging')
-print(paper_list)
+# paper_list = data.load_folder('Papers', 'aging')
+# print(paper_list)
 
 
 
