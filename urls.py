@@ -1,5 +1,7 @@
 '''Functions for Searching and Retrieving Papers'''
 
+import os
+import json
 from requester import Requester
 from bs4 import BeautifulSoup, SoupStrainer
 
@@ -53,15 +55,15 @@ def build_fetch(ids, use_hist=False, query_key=None, WebEnv=None, retstart=None,
     ids : list
         ID numbers of the papers to retrieve
     use_hist: Bool
-
+        Whether to use the EUtils feature, use history, for large scrapes
     query_key : str
 
     WebEnv : str
 
     retstart : int
-
+        Index from which to begin paper collection
     retmax : int
-
+        Number of papers to be collected (per fetch call)
     retmode : str
         Format the paper is returned in (preset as XML)
     db : str
@@ -79,27 +81,53 @@ def build_fetch(ids, use_hist=False, query_key=None, WebEnv=None, retstart=None,
 
     fetch_base = base_url + 'efetch.fcgi?'
 
+    # Using history
     if use_hist:
 
+        # Raise error if user didn't enter enough information to make fetch call
         if query_key is None or WebEnv is None or retstart is None or retmax is None:
             raise Exception('Must specify query_key, WebEnv, retstart, and retmax if using history')
 
+        # Otherwise, build the fetch URL
         else: 
-
             fetch = fetch_base + db + '&query_key=' + query_key + '&WebEnv=' + WebEnv + retmode + '&retstart=' + str(retstart) + '&retmax=' + str(retmax)
 
+    # Using IDs
     elif not use_hist:
 
-        ids_str = ','.join(ids)
+        # Check type of IDs that are passed into the function -- must be a list for .join() method to work
+        if isinstance(ids, list):
 
-        fetch = fetch_base + db + retmode + "&id=" + ids_str
+            # Join the list of IDs together, separated by commas
+            ids_str = ','.join(ids)
+
+            # Build fetch with list of IDs
+            fetch = fetch_base + db + retmode + "&id=" + ids_str
+
+        # Raise error if IDs are not given as a list
+        else:
+            raise Exception('Please give Ids as a list')
 
     return fetch
 
 
 def build_info(db='db=pubmed', retmode='retmode=xml'):
-    """Function for finding database info using NCBI's EInfo call"""
+    """Function for finding database info using NCBI's EInfo call
     
+    Parameters
+    ----------
+    db : str
+        Specify the database to search (preset as PubMed)
+    retmode : str
+        Format the paper is returned in (preset as XML)
+
+    Returns
+    -------
+    info : str
+        URL to a page containing pertinent database info
+    """
+    
+    # Build the EInfo URL
     info_base = base_url + 'einfo.fcgi?'
     info = info_base + db + '&' + retmode
 
@@ -129,13 +157,15 @@ def save_db_info(save_location):
     db_info = {}
 
     # Extract info from the webpage
-    db_info['db_name'] = page_soup.DbInfo.MenuName.text
-    db_info['description'] = page_soup.DbInfo.Description.text
-    db_info['build'] = page_soup.DbInfo.DbBuild.text
-    db_info['last update'] = page_soup.DbInfo.LastUpdate.text
+    db_info['dbname'] = page_soup.dbinfo.dbname.text
+    db_info['count'] = page_soup.dbinfo.count.text
+    db_info['dbbuild'] = page_soup.dbinfo.dbbuild.text
+    db_info['lastupdate'] = page_soup.dbinfo.lastupdate.text
 
-    save_location = os.path.join(path, 'db_info.json')
+    # Store the path to the save location
+    save_location = os.path.join(save_location, 'db_info.json')
 
+    # Save the database info header file
     with open(save_location, 'w') as header_file:
         json.dump(db_info, header_file)
 
@@ -209,7 +239,8 @@ def get_use_hist(search_url):
 
     Returns
     -------
-
+    count, query_key, WebEnv : tuple (str, str, str)
+        Tuple containing info necessary to make a fetch call for desired papers
     """
 
     # Use requester to opent the search url
@@ -219,6 +250,7 @@ def get_use_hist(search_url):
     # Use BeatifulSoup to convert webpage into a more convenient form for extraction
     page_soup = BeautifulSoup(page.content, "lxml")
 
+    # Extract the necessary information from the page for use history call
     count = int(page_soup.find('count').text)
     query_key = page_soup.find('querykey').text
     WebEnv = page_soup.find('webenv').text
@@ -226,91 +258,16 @@ def get_use_hist(search_url):
     return count, query_key, WebEnv
 
 
-def crawl(start_url, page_number=0, pr_links=list()):
-    """Crawls a press release database compiling links to individual articles
-
-    Parameters
-    ----------
-    start_url : str
-        URL of the main press release page - search for links starts from here
-    page_number : int
-        Indicates the page to start from (preset to 0) - indexed from 0
-    pr_links : list of str
-        List of the URLs for individual press releases found in the search
-
-    Returns
-    -------
-    pr_links : list of str
-        List of the URLs for individual press releases found
-
-    Notes
-    -----
-    - The list pr_links is initialized as an argument of the function so that the recursive call
-    adds to the original list rather than create a new list for every page that is searched.
-    """
-
-    # Initialize requester object for handling URLs
-    req = Requester()
-
-    # Open the page to begin the search
-    page = req.get_url(start_url)
-
-    # Use BeatifulSoup to convert webpage into a more convenient form for extraction
-    title = BeautifulSoup(page.text, 'lxml').title.text
-    # Extract links only from page content
-    page_soup = BeautifulSoup(page.text, 'lxml', parse_only=SoupStrainer('a', href=True))
-
-    # Variable for storing number of links before a page is searched
-    len_before = len(pr_links)
-
-    # Not gonna lie sorting through these links is a bit gimmicky
-    # Sort through links, adding only those connected to individual press releases
-    for tag in page_soup.find_all('a'):
-        link = tag.get('href')
-        if link not in pr_links and 'news-releases/' in link and link != '/news-releases/feed.xml':
-            pr_links.append(link)
-
-    # Ends the search the first time 0 links are added to the list
-    if len_before == len(pr_links):
-        print(type(pr_links))
-        return(pr_links)
-
-    # Increment the page number and generate the URL of the next page
-    page_number += 1
-    next_page_url = 'https://www.nih.gov/news-events/news-releases?page=' + str(page_number)
-
-    # Recursive call runs through all PR pages
-    if 'The page you’re looking for isn’t available' not in title:
-        crawl(next_page_url, page_number, pr_links)
 
 
 
-'''
-Dictionary for storing NIH Databases and their respective search terms for papers
-Top section is for sites that should be easier to navigate, bottom sections are each more difficult
-Some subdivisions of the NIH were omitted completely because there were not helpful (no science occuring) or too difficult to navigate
-'''
 
-db_terms = {
-            # Easiest/Closest to existing code
-            'https://www.cancer.gov/news-events': 'cancer',  # Not very many PRs
-            'https://www.nia.nih.gov/newsroom/press-releases': 'aging', # Works the same as NIH
-            'https://www.niaaa.nih.gov/news-events/news-releases': 'alcohol abuse, alcoholism', # Same as NIH
-            'https://www.niaid.nih.gov/news-events/news-releases': 'allergy, infectious diseases', # All on 1 page
-            'https://www.drugabuse.gov/news-events/news': 'drug abuse', # Same as NIH
-            
-            'https://www.ninds.nih.gov/News-Events/News-and-Press-Releases/Press-Releases': 'stroke',
 
-            # Medium difficulty
-            'https://nei.nih.gov/news/pressreleases': 'eye?', 
-            'https://www.nichd.nih.gov/news/releases/Pages/news.aspx': 'child health, human dev',
-            'https://www.niddk.nih.gov/news/Pages/news-releases.aspx': 'diabetes, digestive and kidney disease',
 
-            # These look either hard or not that useful
-            'https://www.nimh.nih.gov/news/index.shtml': 'mental health',
-            'https://www.niehs.nih.gov/news/newsroom/releases/index.cfm': 'environmental health sciences',
-            'https://www.nhlbi.nih.gov/news/press-releases': 'heart, lung, blood', 
-            'https://www.genome.gov/10000475/current-news-releases/': 'genome',
-            'https://www.niams.nih.gov/News_and_Events/': 'arthritis, skin diseases', 
-            'https://www.nibib.nih.gov/news-events/newsroom?news-type=29&health-terms=All&pub-date%5Bvalue%5D%5Byear%5D=': 'bioengineering'
-            }
+https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=research&dt=in&inthe=604800&amo=1&ady=8&ayr=2018&bmo=1&bdy=15&byr=2018&op6=&fl6=keywords%3A&ty6=p&rf=0
+https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=&dt=in&inthe=604800&amo=1&ady=8&ayr=2018&bmo=1&bdy=15&byr=2018&op6=&fl6=keywords%3A&ty6=p&rf=0
+
+
+
+
+
