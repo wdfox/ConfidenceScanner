@@ -73,12 +73,11 @@ def scrape_pr_data(url, path):
 
     # Get press release into a more convenient format for info extraction
     page_soup = BeautifulSoup(art_page.content, 'lxml')
-    print(page_soup)
 
     # Initialize a press release object to store the scraped data and extract info
-    pr = Press_Release(url)
+    pr = base.Press_Release(url)
     pr.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    pr.extract_add_info()
+    pr.extract_add_info(page_soup)
 
     # Close the URL request
     req.close()
@@ -89,7 +88,7 @@ def scrape_pr_data(url, path):
     return(pr)
 
 
-def build_path(data_type, search_term, root_dir='Data/'):
+def build_path(data_type, search_term, batch=None, root_dir='Data/'):
     """Gives the path to the save locations of paper or pr objects
 
     Parameters
@@ -109,6 +108,10 @@ def build_path(data_type, search_term, root_dir='Data/'):
 
     # Join the elements together to create the desired path
     path = os.path.join(root_dir, data_type, search_term)
+
+    # For press releases add on the batch number
+    if batch is not None:
+        path = os.path.join(path, batch)
 
     # If the path does exist, ask the user if they are okay with overwriting data
     if os.path.isdir(path):
@@ -228,21 +231,20 @@ def load_folder(data_type, search_term, root_dir='Data/'):
     files = [f for f in files if f[0] in '0123456789']
 
     # Initialize a list to store the paper or press release objects generated
-    items = []
+    items = [None] * len(files)
 
     # Go through directory, loading each file into an individual object, append to items
-    for file in files:
+    for ind, file in enumerate(files):
         path = os.path.join(directory, file)
         if data_type == 'Papers':
             paper = load_paper_json(path)
-            if isinstance(paper.text, list):
-                items.append(paper)
+            items[ind] = paper
         elif data_type == 'PRs':
             pr = load_pr_json(path)
-            items.append(pr)
+            items[ind] = pr
 
     # Filter out papers with no abstract text, redundant with above inside loop isinstance call
-    items = [items for paper in items if paper.text not None]
+    items = [items for paper in items if paper.text is not None]
 
     return(items)
 
