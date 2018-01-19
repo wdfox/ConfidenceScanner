@@ -89,7 +89,7 @@ def build_fetch(ids, use_hist=False, query_key=None, WebEnv=None, retstart=None,
             raise Exception('Must specify query_key, WebEnv, retstart, and retmax if using history')
 
         # Otherwise, build the fetch URL
-        else: 
+        else:
             fetch = fetch_base + db + '&query_key=' + query_key + '&WebEnv=' + WebEnv + retmode + '&retstart=' + str(retstart) + '&retmax=' + str(retmax)
 
     # Using IDs
@@ -113,7 +113,7 @@ def build_fetch(ids, use_hist=False, query_key=None, WebEnv=None, retstart=None,
 
 def build_info(db='db=pubmed', retmode='retmode=xml'):
     """Function for finding database info using NCBI's EInfo call
-    
+
     Parameters
     ----------
     db : str
@@ -126,7 +126,7 @@ def build_info(db='db=pubmed', retmode='retmode=xml'):
     info : str
         URL to a page containing pertinent database info
     """
-    
+
     # Build the EInfo URL
     info_base = base_url + 'einfo.fcgi?'
     info = info_base + db + '&' + retmode
@@ -202,7 +202,7 @@ def get_ids(search_url):
 
 def ids_to_str(ids):
     """Extracts IDs and converts them to str
-    
+
     Parameters
     ----------
     ids : bs4.element.ResultSet
@@ -264,8 +264,8 @@ def get_use_hist(search_url):
 
 
 
-https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=research&dt=in&inthe=604800&amo=1&ady=8&ayr=2018&bmo=1&bdy=15&byr=2018&op6=&fl6=keywords%3A&ty6=p&rf=0
-https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=&dt=in&inthe=604800&amo=1&ady=8&ayr=2018&bmo=1&bdy=15&byr=2018&op6=&fl6=keywords%3A&ty6=p&rf=0
+# https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=research&dt=in&inthe=604800&amo=1&ady=8&ayr=2018&bmo=1&bdy=15&byr=2018&op6=&fl6=keywords%3A&ty6=p&rf=0
+# https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=&dt=in&inthe=604800&amo=1&ady=8&ayr=2018&bmo=1&bdy=15&byr=2018&op6=&fl6=keywords%3A&ty6=p&rf=0
 
 
 
