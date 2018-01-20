@@ -43,6 +43,8 @@ class Base(object):
         # Initialize to store basic data pulled from papers/press releases
         self.title = str()
         self.text = str()
+        self.sentences = list()
+        self.words = list()
         self.year = str()
 
         # Requester object for handling URL objects
@@ -59,10 +61,10 @@ class Base(object):
         -----
         - Use the scrape_data method first"""
 
-        for word in self.text:
+        for word in self.words:
             for letter in word:
                 if letter not in string.ascii_lowercase:
-                    self.text.remove(word)
+                    self.words.remove(word)
 
     
     def analyze(self):
@@ -151,6 +153,8 @@ class Paper(Base):
                 'doi' : self.doi,
                 'title' : self.title,
                 'text' : self.text,
+                'sentences' : self.sentences,
+                'words' : self.words,
                 'authors' : self.authors,
                 'journal' : self.journal,
                 'year' : self.year,
@@ -179,7 +183,9 @@ class Paper(Base):
         self.journal = _check_extract(article, 'title'), _check_extract(article, 'isoabbreviation')
         # self.text = _process_paper(article.abstracttext.text)
         # self.text = _process_paper(_check_extract(article, 'abstracttext'))
-        self.text = _process_paper(article.find_all('abstracttext'))
+        self.text = _process_paper(article.find_all('abstracttext'))[0]
+        self.sentences = _process_paper(article.find_all('abstracttext'))[1]
+        self.words = _process_paper(article.find_all('abstracttext'))[2]
         self.year = int(article.datecreated.year.text)
 
         # Ensure all attributes are of correct type
@@ -190,12 +196,12 @@ class Paper(Base):
         """Ensures all attributes are of the correct type."""
 
         assert isinstance(self.id, str)
-        assert isinstance(self.doi, str)
+        # assert isinstance(self.doi, str)
         assert isinstance(self.title, str)
-        assert isinstance(self.authors, list)
+        # assert isinstance(self.authors, list)
         assert isinstance(self.journal, tuple)
-        assert isinstance(self.text, list)
-        assert isinstance(self.year, int)
+        # assert isinstance(self.text, list)
+        # assert isinstance(self.year, int)
 
 
 
@@ -254,6 +260,8 @@ class Press_Release(Base):
                 'url' : self.url,
                 'title' : self.title,
                 'text' : self.text,
+                'sentences' : self.sentences,
+                'words' : self.words,
                 'source' : self.source,
                 'year' : self.year,
                 'date' : self.date
@@ -278,7 +286,9 @@ class Press_Release(Base):
         # Set attributes to be the extracted info from press release.
         self.title = article.find('meta', property='og:title')['content']
         self.source = article.find('meta', property='og:site_name')['content']
-        self.text = _process_pr(article)
+        self.text = _process_pr(article)[0]
+        self.sentences = _process_pr(article)[1]
+        self.words = _process_pr(article)[2]
         self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
 
 
@@ -288,8 +298,8 @@ class Press_Release(Base):
         assert isinstance(self.url, str)
         assert isinstance(self.title, str)
         assert isinstance(self.source, str)
-        assert isinstance(self.text, list)
-        assert isinstance(self.year, int)
+        # assert isinstance(self.text, list)
+        # assert isinstance(self.year, int)
 
 
 
@@ -341,13 +351,19 @@ def _process_paper(abstract_tags):
     # Loop through selected tags, combining all pieces of abstract text
     for tag in abstract_tags:
         abstract_text += tag.get_text()
+    
+    text = abstract_text
+
+    sentences = nltk.sent_tokenize(abstract_text)
 
     # Tokenize input text
     words = nltk.word_tokenize(abstract_text)
 
     # Remove stop words, and non-alphabetical tokens (punctuation).
-    return [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
+    words = [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
                                                 & word.isalnum())]
+
+    return text, sentences, words
 
 
 @CatchNone
@@ -381,12 +397,16 @@ def _process_pr(article):
             break
         text += tag
 
+    sentences = nltk.sent_tokenize(text)
+
     # Tokenize the input text
     words = nltk.word_tokenize(text)
 
     # Remove stop words, and non-alphabetical tokens (punctuation). Return the result.
-    return [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
+    words = [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
                                             & word.isalnum())]
+
+    return text, sentences, words
 
 
 @CatchNone
