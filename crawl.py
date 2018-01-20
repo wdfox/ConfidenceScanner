@@ -81,8 +81,8 @@ def pr_crawl(pr_count, search_term, start_date, end_date):
 			next_page.click()
 
 			# No accidental DDoS attacks
-            sleep_time = random.uniform(4.0, 5.0)
-            time.sleep(sleep_time)
+			sleep_time = random.uniform(4.0, 5.0)
+			time.sleep(sleep_time)
 
 		except:
 			pages_continue = False
