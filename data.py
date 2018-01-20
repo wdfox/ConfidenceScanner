@@ -244,7 +244,7 @@ def load_folder(data_type, search_term, root_dir='Data/'):
             items[ind] = pr
 
     # Filter out papers with no abstract text, redundant with above inside loop isinstance call
-    items = [items for paper in items if paper.text is not None]
+    items = [paper for paper in items if paper.text is not None]
 
     return(items)
 
@@ -274,6 +274,8 @@ def load_paper_json(path):
     paper.authors = info_dict['authors']
     paper.journal = info_dict['journal']
     paper.text = info_dict['text']
+    paper.sentences = info_dict['sentences']
+    paper.words = info_dict['words']
     paper.year = info_dict['year']
     paper.date = info_dict['date']
 
@@ -302,6 +304,8 @@ def load_pr_json(path):
     pr = base.Press_Release(info_dict['url'])
     pr.title = info_dict['title']
     pr.text = info_dict['text']
+    pr.sentences = info_dict['sentences']
+    pr.words = info_dict['words']
     pr.source = info_dict['source']
     pr.year = info_dict['year']
     pr.date = info_dict['date']
