@@ -100,10 +100,10 @@ from bs4 import BeautifulSoup
 # data.scrape_pr_data(url='https://www.eurekalert.org/pub_releases/2017-08/uoc--lbb080817.php', path=None)
 # data.scrape_pr_data(url='https://www.eurekalert.org/pub_releases/2017-11/brf-sfn112817.php', path=None)
 
-end_date = datetime.date.today()
-start_date = end_date.replace(day=end_date.day-6)
+# end_date = datetime.date.today()
+# start_date = end_date.replace(day=end_date.day-6)
 
-collect_prs(search_term='aging', start_date=start_date, end_date=end_date)
+# collect_prs(search_term='aging', start_date=start_date, end_date=end_date)
 
 
 ################
@@ -159,8 +159,30 @@ collect_prs(search_term='aging', start_date=start_date, end_date=end_date)
 # paper = data.load_paper_json(paper_path)
 # print(paper.id)
 
-# paper_list = data.load_folder('Papers', 'aging')
+paper_list = data.load_folder('Papers', 'autism')
 # print(paper_list)
+# print(len(paper_list))
+
+
+
+
+##################
+### Collection ###
+##################
+
+# collect_papers(paper_count='500', search_term='dementia', use_hist=True)
+# collect_papers(paper_count='500', search_term='autism', use_hist=True)
+
+# start_date = datetime.date(year=2017, month=1, day=1)
+# end_date = datetime.date(year=2017, month=12, day=31)
+
+# collect_prs(search_term='dementia', start_date, end_date, pr_count=500)
+# collect_prs(search_term='autism', start_date, end_date, pr_count=500)
+
+
+
+
+
 
 
 
