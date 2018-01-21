@@ -2,3 +2,5 @@
 *DS_Store*
 # Ignore cache files
 **__pycache__**
+# Ignore noteobook checkpoint files
+*/.ipynb_checkpoints/*
