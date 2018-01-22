@@ -164,29 +164,6 @@ paper_list = data.load_folder('Papers', 'autism')
 # print(len(paper_list))
 
 
-
-
-##################
-### Collection ###
-##################
-
-# collect_papers(paper_count='500', search_term='dementia', use_hist=True)
-# collect_papers(paper_count='500', search_term='autism', use_hist=True)
-
-# start_date = datetime.date(year=2017, month=1, day=1)
-# end_date = datetime.date(year=2017, month=12, day=31)
-
-# collect_prs(search_term='dementia', start_date, end_date, pr_count=500)
-# collect_prs(search_term='autism', start_date, end_date, pr_count=500)
-
-
-
-
-
-
-
-
-
 """
 
 NOTES:

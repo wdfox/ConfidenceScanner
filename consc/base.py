@@ -4,7 +4,7 @@
     git push
     git diff """
 
-'''Classes and functions for collecting, cleaning 
+'''Classes and functions for collecting, cleaning
    and storing paper and press release info.'''
 
 import datetime
@@ -12,8 +12,9 @@ import string
 from bs4 import BeautifulSoup
 import nltk
 from nltk.corpus import stopwords
-import urls
-from requester import Requester
+
+import consc.urls
+from consc.requester import Requester
 
 
 class Base(object):
@@ -35,7 +36,7 @@ class Base(object):
 
     def __init__(self):
         """Initializes an instance of the base class."""
-        
+
         # Initialize the lists of confidence terms used
         # self.high_confidence = list()
         # self.low_confidence = list()
@@ -66,7 +67,7 @@ class Base(object):
                 if letter not in string.ascii_lowercase:
                     self.words.remove(word)
 
-    
+
     def analyze(self):
         """Runs confidence analysis on text from paper or press release.
 
@@ -99,7 +100,7 @@ class Base(object):
 
 class Paper(Base):
     """Class for collecting and analyzing scientific papers.
-    
+
     Attributes
     ----------
     title : str
@@ -310,7 +311,7 @@ class Press_Release(Base):
 ##########################################################################
 
 def CatchNone(func):
-    """Decorator function to catch and return None, 
+    """Decorator function to catch and return None,
                 if given as argument."""
 
     def wrapper(arg):
@@ -351,7 +352,7 @@ def _process_paper(abstract_tags):
     # Loop through selected tags, combining all pieces of abstract text
     for tag in abstract_tags:
         abstract_text += tag.get_text()
-    
+
     text = abstract_text
 
     sentences = nltk.sent_tokenize(abstract_text)
@@ -379,7 +380,7 @@ def _process_pr(article):
     -------
     words_cleaned : list of str
         List of words, after processing.
-    
+
     Notes
     -----
     - This function is just heuristics right now - could be improved.
@@ -389,7 +390,7 @@ def _process_pr(article):
 
     tags = article.find_all(name='p', class_=False)
     # print(tags)
-    
+
     for tag in tags:
         tag = tag.get_text()
         # Heuristic for eliminating excess text that is unrelated to the article
@@ -446,7 +447,7 @@ def _process_authors(author_list):
 
 
 def _check_extract(tag, label):
-    
+
     try:
         return tag.find(label).text
     except:

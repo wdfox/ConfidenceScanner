@@ -1,14 +1,15 @@
 '''Functions designed to collect all data starting with a single search term/database pairing'''
 
-import base
-import urls
-import data
-import crawl
-from requester import Requester
-
 import os
 import time
 import random
+
+
+import consc.base
+import consc.urls
+import consc.data
+import consc.crawl
+from consc.requester import Requester
 
 
 
@@ -72,7 +73,7 @@ def collect_papers(paper_count, search_term, use_hist=False):
 
         # Build search URL
         search = urls.build_search(search_term, retmax=paper_count)
-        
+
         # Get associated IDs
         ids = urls.get_ids(search)
 
@@ -128,7 +129,7 @@ def collect_prs(search_term, start_date, end_date, pr_count=500):
             pr = data.scrape_pr_data(url, path)
             outfile = '{:04d}.json'.format(ind)
             data.save(path, outfile, pr)
-            
+
             # Sleep for a variable time to ensure we don't get an IP blocked
             sleep_time = random.uniform(2.0, 3.0)
             time.sleep(sleep_time)
