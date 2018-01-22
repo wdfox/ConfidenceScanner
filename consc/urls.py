@@ -2,9 +2,9 @@
 
 import os
 import json
-from requester import Requester
 from bs4 import BeautifulSoup, SoupStrainer
 
+from consc.requester import Requester
 
 # URL for searching the PubMed online database
 base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"

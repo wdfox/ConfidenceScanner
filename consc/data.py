@@ -1,13 +1,16 @@
 ''' Functions for saving and loading data into json file format '''
 
-import base
+
 import json
 import os
 import datetime
-from requester import Requester
+
 
 from bs4 import BeautifulSoup
 from shutil import copy2
+
+import consc.base
+from consc.requester import Requester
 
 def scrape_paper_data(url, path, retstart=0):
 	"""Retrieve the paper from PubMed and extract the info.
@@ -139,20 +142,20 @@ def clear_db(path):
 
 	# If the user does want to overwrite data, temporary archive existing data and empty the directory
 	if overwrite == 'y':
-		
+
 		# Create temporary archive
 		archive = os.path.join('Data', 'Archive')
 
 		# Archive and delete files
 		for file in os.listdir(path):
 			file_path = os.path.join(path, file)
-			
+
 			# Copy the db contents into the temporary archive
 			copy2(file_path, archive)
 
 			# Delete all files in the directory where new data will be saved
 			os.unlink(file_path)
-	
+
 	# If user does not want to overwrite data, raise an error and quit
 	elif overwrite =='n':
 		raise RuntimeError('Save function quit to avoid overwriting existing data')
