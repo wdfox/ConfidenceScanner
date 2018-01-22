@@ -5,10 +5,10 @@ import time
 import random
 
 
-import consc.base
-import consc.urls
-import consc.data
-import consc.crawl
+import consc.base as base
+import consc.urls as urls
+import consc.data as data
+import consc.crawl as crawl
 from consc.requester import Requester
 
 

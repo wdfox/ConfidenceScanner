@@ -9,7 +9,7 @@ import datetime
 from bs4 import BeautifulSoup
 from shutil import copy2
 
-import consc.base
+import consc.base as base
 from consc.requester import Requester
 
 def scrape_paper_data(url, path, retstart=0):

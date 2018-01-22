@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 import nltk
 from nltk.corpus import stopwords
 
-import consc.urls
+import consc.urls as urls
 from consc.requester import Requester
 
 
