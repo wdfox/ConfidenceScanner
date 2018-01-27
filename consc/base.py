@@ -179,9 +179,14 @@ class Paper(Base):
         self.journal = _check_extract(article, 'title'), _check_extract(article, 'isoabbreviation')
         # self.text = _process_paper(article.abstracttext.text)
         # self.text = _process_paper(_check_extract(article, 'abstracttext'))
-        self.text = _process_paper(article.find_all('abstracttext'))[0]
-        self.sentences = _process_paper(article.find_all('abstracttext'))[1]
-        self.words = _process_paper(article.find_all('abstracttext'))[2]
+
+        # NOTE: This runs '_process_paper' 3 times, which is unneeded
+        #  note that we can chain outputs, as in "a, b = 1, 2", so:
+        self.text, self.sentences, self.words = _process_paper(article.find_all('abstracttext'))
+        #self.text = _process_paper(article.find_all('abstracttext'))[0]
+        #self.sentences = _process_paper(article.find_all('abstracttext'))[1]
+        #self.words = _process_paper(article.find_all('abstracttext'))[2]
+
         self.year = int(article.datecreated.year.text)
 
         # Ensure all attributes are of correct type
@@ -282,9 +287,13 @@ class Press_Release(Base):
         # Set attributes to be the extracted info from press release.
         self.title = article.find('meta', property='og:title')['content']
         self.source = article.find('meta', property='og:site_name')['content']
-        self.text = _process_pr(article)[0]
-        self.sentences = _process_pr(article)[1]
-        self.words = _process_pr(article)[2]
+        # NOTE: same as above:
+        self.text, self.sentences, self.words = _process_pr(article)
+
+        #self.text = _process_pr(article)[0]
+        #self.sentences = _process_pr(article)[1]
+        #self.words = _process_pr(article)[2]
+
         self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
 
 
@@ -296,9 +305,6 @@ class Press_Release(Base):
         assert isinstance(self.source, str)
         # assert isinstance(self.text, list)
         # assert isinstance(self.year, int)
-
-
-
 
 
 ##########################################################################
@@ -317,9 +323,6 @@ def CatchNone(func):
             return None
 
     return wrapper
-
-
-
 
 
 #########################################################################
