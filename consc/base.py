@@ -1,11 +1,4 @@
-""" git status
-    git add
-    git commit -m ""
-    git push
-    git diff """
-
-'''Classes and functions for collecting, cleaning
-   and storing paper and press release info.'''
+"""Classes and functions for collecting, cleaning and storing paper and press release info."""
 
 import datetime
 import string
@@ -16,6 +9,8 @@ from nltk.corpus import stopwords
 import consc.urls as urls
 from consc.requester import Requester
 
+##
+##
 
 class Base(object):
     """Base class for running confidence analysis
@@ -150,17 +145,17 @@ class Paper(Base):
         """Creates a dictionary to store the paper object's attributes."""
 
         return {
-                'id' : self.id,
-                'doi' : self.doi,
-                'title' : self.title,
-                'text' : self.text,
-                'sentences' : self.sentences,
-                'words' : self.words,
-                'authors' : self.authors,
-                'journal' : self.journal,
-                'year' : self.year,
-                'date' : self.date
-                }
+            'id' : self.id,
+            'doi' : self.doi,
+            'title' : self.title,
+            'text' : self.text,
+            'sentences' : self.sentences,
+            'words' : self.words,
+            'authors' : self.authors,
+            'journal' : self.journal,
+            'year' : self.year,
+            'date' : self.date
+            }
 
 
     def extract_add_info(self, article):
@@ -258,15 +253,15 @@ class Press_Release(Base):
         """Creates a dictionary to store the pr object's attributes."""
 
         return {
-                'url' : self.url,
-                'title' : self.title,
-                'text' : self.text,
-                'sentences' : self.sentences,
-                'words' : self.words,
-                'source' : self.source,
-                'year' : self.year,
-                'date' : self.date
-                }
+            'url' : self.url,
+            'title' : self.title,
+            'text' : self.text,
+            'sentences' : self.sentences,
+            'words' : self.words,
+            'source' : self.source,
+            'year' : self.year,
+            'date' : self.date
+            }
 
 
     def extract_add_info(self, article):
