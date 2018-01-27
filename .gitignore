@@ -4,3 +4,5 @@
 **__pycache__**
 # Ignore noteobook checkpoint files
 */.ipynb_checkpoints/*
+# Ignore compiled files
+*.pyc
