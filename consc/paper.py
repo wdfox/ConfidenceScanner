@@ -67,19 +67,6 @@ class Paper(Base):
 
         return base_dict
 
-        # return {
-        #     'id' : self.id,
-        #     'doi' : self.doi,
-        #     'title' : self.title,
-        #     'text' : self.text,
-        #     #'sentences' : self.sentences,
-        #     #'words' : self.words,
-        #     'authors' : self.authors,
-        #     'journal' : self.journal,
-        #     'year' : self.year,
-        #     'date' : self.date
-        #     }
-
 
     def extract_add_info(self, article):
         """Extract information from PubMed paper.
@@ -98,15 +85,9 @@ class Paper(Base):
         self.title = check_extract(article, 'articletitle')
         self.authors = _process_authors(article.authorlist)
         self.journal = check_extract(article, 'title'), check_extract(article, 'isoabbreviation')
-
         self.doi = _process_doi(article.find('articleid', idtype='doi'))
-        #print(self.doi)
-        #self.doi = article.find('articleid', {'idtype' : 'doi'}).text
-
         self.date = _process_date(article.find('articledate'))
-
         self.text = _process_paper(article.find_all('abstracttext'))
-        #self.text, self.sentences, self.words = _process_paper(article.find_all('abstracttext'))
 
         # Ensure all attributes are of correct type
         self._check_type()
@@ -161,16 +142,7 @@ def _process_paper(abstract_tags):
 
     text = abstract_text
 
-    #sentences = nltk.sent_tokenize(abstract_text)
-
-    # # Tokenize input text
-    # words = nltk.word_tokenize(abstract_text)
-
-    # # Remove stop words, and non-alphabetical tokens (punctuation).
-    # words = [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
-    #                                             & word.isalnum())]
-
-    return text#, sentences, words
+    return text
 
 
 @CatchNone
