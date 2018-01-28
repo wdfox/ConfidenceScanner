@@ -32,7 +32,6 @@ class Base(object):
         self.title = str()
         self.text = str()
         self.date = str()
-        self.year = str()
 
         self.sentences = list()
         self.words = list()
@@ -44,7 +43,6 @@ class Base(object):
         return {
             'title' : self.title,
             'text' : self.text,
-            'year' : self.year,
             'date' : self.date
         }
 

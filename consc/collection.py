@@ -184,7 +184,6 @@ def scrape_paper_data(url, path, retstart=0):
         # For each article, pull the ID and extract relevant info
         art_id = article.find('articleid', idtype='pubmed').text
         paper = Paper(art_id)
-        paper.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         paper.extract_add_info(article)
 
         # Ensure all attributes are of the correct type
