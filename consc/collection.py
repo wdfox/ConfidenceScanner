@@ -93,8 +93,9 @@ def collect_papers(search_term, paper_count, use_hist=False):
         # Scrape and save data for each article into JSON
         scrape_paper_data(art_url, path)
 
+    # NOTE: do we have to do this?
     # Clear archived data after a successful scrape
-    data.clear_archive()
+    #data.clear_archive()
 
 
 def collect_prs(search_term, start_date, end_date, pr_count=500):
@@ -191,7 +192,7 @@ def scrape_paper_data(url, path, retstart=0):
 
         # Save paper object to JSON file
         outfile = '{:04d}.json'.format(ind+retstart)
-        save(path, outfile, paper)
+        data.save(path, outfile, paper)
 
     # Close the URL request
     req.close()
@@ -226,6 +227,6 @@ def scrape_pr_data(url, path):
     req.close()
 
     # Ensure all attributes are of the correct type
-    pr._check_type()
+    #pr._check_type()
 
     return(pr)

@@ -115,7 +115,8 @@ def save(path, outfile, data):
     file_path = os.path.join(path, outfile)
 
     # Convert our information into a savable dictionary format
-    info_dict = data.__dict__()
+    #info_dict = data.__dict__()
+    info_dict = data.as_dict()
 
     # Save information to the path generated, each entry on its own line
     with open(file_path, 'w') as outfile:
