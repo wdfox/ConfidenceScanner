@@ -19,6 +19,8 @@ def build_path(data_type, search_term, batch=None, root_dir='Data/'):
         Type of data (Paper or Press_Release) to be found
     search_term : str
         PubMed search term (papers) or government database (press releases) used to find the given info
+    batch : ?
+        xx
     root_dir : str
         Directory that the JSON files will be saved under
 
