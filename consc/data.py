@@ -4,7 +4,8 @@ import os
 import json
 from shutil import copy2
 
-from consc.base import Paper, Press_Release
+from consc.paper import Paper
+from consc.press_release import Press_Release
 
 ###################################################################################################
 ###################################################################################################
@@ -200,13 +201,15 @@ def load_folder(data_type, search_term, root_dir='Data/'):
     return(items)
 
 
-def load_paper_json(path):
+def load_paper_json(path, proc_text=True):
     """Load an individual paper object from JSON file
 
     Parameters
     ----------
     path : str
         Path to the save location of the desired paper to load
+    proc_text : bool, optional
+        Whether to process text (tokenize) on load. Default: True
 
     Returns
     -------
@@ -225,21 +228,27 @@ def load_paper_json(path):
     paper.authors = info_dict['authors']
     paper.journal = info_dict['journal']
     paper.text = info_dict['text']
-    paper.sentences = info_dict['sentences']
-    paper.words = info_dict['words']
     paper.year = info_dict['year']
     paper.date = info_dict['date']
+    #paper.sentences = info_dict['sentences']
+    #paper.words = info_dict['words']
+
+    if proc_text:
+        paper.tokenize_sentences()
+        paper.tokenize_words()
 
     return(paper)
 
 
-def load_pr_json(path):
+def load_pr_json(path, proc_text=True):
     """Load an individual Press_Release object from JSON file
 
     Parameters
     ----------
     path : str
         Path to the save location of the desired press release to load
+    proc_text : bool, optional
+        Whether to process text (tokenize) on load. Default: True
 
     Returns
     -------
@@ -255,10 +264,14 @@ def load_pr_json(path):
     pr = Press_Release(info_dict['url'])
     pr.title = info_dict['title']
     pr.text = info_dict['text']
-    pr.sentences = info_dict['sentences']
-    pr.words = info_dict['words']
     pr.source = info_dict['source']
     pr.year = info_dict['year']
     pr.date = info_dict['date']
+    #pr.sentences = info_dict['sentences']
+    #pr.words = info_dict['words']
+
+    if proc_text:
+        pr.tokenize_sentences()
+        pr.tokenize_words()
 
     return(pr)

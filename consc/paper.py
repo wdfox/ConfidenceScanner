@@ -62,8 +62,8 @@ class Paper(Base):
             'doi' : self.doi,
             'title' : self.title,
             'text' : self.text,
-            'sentences' : self.sentences,
-            'words' : self.words,
+            #'sentences' : self.sentences,
+            #'words' : self.words,
             'authors' : self.authors,
             'journal' : self.journal,
             'year' : self.year,
@@ -89,7 +89,7 @@ class Paper(Base):
         self.title = check_extract(article, 'articletitle')
         self.authors = _process_authors(article.authorlist)
         self.journal = check_extract(article, 'title'), check_extract(article, 'isoabbreviation')
-        self.year = int(article.datecreated.year.text)
+        #self.year = int(article.datecreated.year.text)
         self.text = _process_paper(article.find_all('abstracttext'))
         #self.text, self.sentences, self.words = _process_paper(article.find_all('abstracttext'))
 

@@ -61,8 +61,8 @@ class Press_Release(Base):
             'url' : self.url,
             'title' : self.title,
             'text' : self.text,
-            'sentences' : self.sentences,
-            'words' : self.words,
+            #'sentences' : self.sentences,
+            #'words' : self.words,
             'source' : self.source,
             'year' : self.year,
             'date' : self.date
@@ -87,7 +87,7 @@ class Press_Release(Base):
         # Set attributes to be the extracted info from press release.
         self.title = article.find('meta', property='og:title')['content']
         self.source = article.find('meta', property='og:site_name')['content']
-        self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
+        #self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
         self.text = _process_pr(article)
         #self.text, self.sentences, self.words = _process_pr(article)
 

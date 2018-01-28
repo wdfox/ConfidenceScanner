@@ -30,10 +30,6 @@ class Base(object):
     def __init__(self):
         """Initializes an instance of the base class."""
 
-        # Initialize the lists of confidence terms used
-        # self.high_confidence = list()
-        # self.low_confidence = list()
-
         # Initialize to store basic data pulled from papers/press releases
         self.title = str()
         self.text = str()
@@ -62,7 +58,7 @@ class Base(object):
                     self.words.remove(word)
 
 
-    def tokenize_sentence(self):
+    def tokenize_sentences(self):
         """Tokenize the full text into sentences."""
 
         self.sentences = nltk.sent_tokenize(self.text)
