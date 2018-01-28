@@ -173,20 +173,10 @@ class Paper(Base):
 
         # Set attributes to be the extracted info from PubMed article.
         self.doi = article.find('articleid', idtype='doi').text
-        # self.title = article.articletitle.text
         self.title = _check_extract(article, 'articletitle')
         self.authors = _process_authors(article.authorlist)
         self.journal = _check_extract(article, 'title'), _check_extract(article, 'isoabbreviation')
-        # self.text = _process_paper(article.abstracttext.text)
-        # self.text = _process_paper(_check_extract(article, 'abstracttext'))
-
-        # NOTE: This runs '_process_paper' 3 times, which is unneeded
-        #  note that we can chain outputs, as in "a, b = 1, 2", so:
         self.text, self.sentences, self.words = _process_paper(article.find_all('abstracttext'))
-        #self.text = _process_paper(article.find_all('abstracttext'))[0]
-        #self.sentences = _process_paper(article.find_all('abstracttext'))[1]
-        #self.words = _process_paper(article.find_all('abstracttext'))[2]
-
         self.year = int(article.datecreated.year.text)
 
         # Ensure all attributes are of correct type
@@ -287,13 +277,7 @@ class Press_Release(Base):
         # Set attributes to be the extracted info from press release.
         self.title = article.find('meta', property='og:title')['content']
         self.source = article.find('meta', property='og:site_name')['content']
-        # NOTE: same as above:
         self.text, self.sentences, self.words = _process_pr(article)
-
-        #self.text = _process_pr(article)[0]
-        #self.sentences = _process_pr(article)[1]
-        #self.words = _process_pr(article)[2]
-
         self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
 
 
@@ -387,15 +371,18 @@ def _process_pr(article):
     text = str()
 
     tags = article.find_all(name='p', class_=False)
-    # print(tags)
 
     for tag in tags:
+
         tag = tag.get_text()
+
         # Heuristic for eliminating excess text that is unrelated to the article
         if tag == '###':
             break
+
         text += tag
 
+    # Tokenize the text into sentences
     sentences = nltk.sent_tokenize(text)
 
     # Tokenize the input text
