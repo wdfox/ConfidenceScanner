@@ -1,4 +1,4 @@
-"""  """
+"""Object for storing and working with Press Release documents."""
 
 from consc.base import Base
 from consc.utils import CatchNone
@@ -29,11 +29,6 @@ class Press_Release(Base):
     See Also
     --------
     - Attributes of Base class.
-
-    Notes
-    -----
-    - May be worth looking into other sources of press releases as well
-        - E.g. journals, universities, EurekAlert!
     """
 
     def __init__(self, url):
@@ -82,17 +77,6 @@ class Press_Release(Base):
             })
 
         return base_dict
-
-        # return {
-
-        #     'title' : self.title,
-        #     'text' : self.text,
-        #     #'sentences' : self.sentences,
-        #     #'words' : self.words,
-        #     #'source' : self.source,
-        #     'year' : self.year,
-        #     'date' : self.date
-        #     }
 
 
     def extract_add_info(self, article):
@@ -209,14 +193,4 @@ def _process_pr_text(article):
 
         text += tag
 
-    # Tokenize the text into sentences
-    #sentences = nltk.sent_tokenize(text)
-
-    # Tokenize the input text
-    # words = nltk.word_tokenize(text)
-
-    # # Remove stop words, and non-alphabetical tokens (punctuation). Return the result.
-    # words = [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
-    #                                         & word.isalnum())]
-
-    return text#, sentences, words
+    return text
