@@ -40,4 +40,4 @@ def sent_subjectivity(text):
 	return result
 
 # train()
-print(sent_subjectivity('I am a huge nerd'))
+# print(sent_subjectivity('I am a huge nerd'))
