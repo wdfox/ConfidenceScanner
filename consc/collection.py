@@ -4,6 +4,7 @@ Notes
 -----
 - 'collect_papers' & 'collect_prs' are the public functions that should be used to launch scrapes.
 - Other functions are sub-functions that should not be launched independently.
+- TODO: This organization uses more requester objects than it needs to. Could be condensed.
 """
 
 import time
@@ -20,15 +21,15 @@ from consc.base import Paper, Press_Release
 ###################################################################################################
 ###################################################################################################
 
-def collect_papers(paper_count, search_term, use_hist=False):
+def collect_papers(search_term, paper_count, use_hist=False):
     """Collects a given number of papers related to a given term
 
     Parameters
     ----------
-    paper_count : str
-        Number of papers to be collected and saved
     search_term : str
         Papers returned will be associated with this term
+    paper_count : int
+        Number of papers to be collected and saved
     use_hist : Bool
         Whether to employ the EUtils use_history feature for large scrapes
 
@@ -54,7 +55,7 @@ def collect_papers(paper_count, search_term, use_hist=False):
         retmax = 10
 
         # Build a search URL for desired IDs, using history
-        search = urls.build_search(search_term, retmax=paper_count, use_hist=True)
+        search = urls.build_search(search_term, retmax=str(paper_count), use_hist=True)
 
         # Extract the necessary info from search page to make fetch calls
         use_hist_info = urls.get_use_hist(search)
@@ -68,7 +69,8 @@ def collect_papers(paper_count, search_term, use_hist=False):
         while retstart < int(paper_count):
 
             # Build a fetch URL with the given parameters
-            art_url = urls.build_fetch(ids=None, use_hist=True, query_key=query_key, WebEnv=WebEnv, retstart=retstart, retmax=retmax)
+            art_url = urls.build_fetch(ids=None, use_hist=True, query_key=query_key,
+                                       WebEnv=WebEnv, retstart=retstart, retmax=retmax)
 
             # Scrape and save data for each article into JSON
             scrape_paper_data(art_url, path, retstart)
@@ -79,7 +81,7 @@ def collect_papers(paper_count, search_term, use_hist=False):
     else:
 
         # Build search URL
-        search = urls.build_search(search_term, retmax=paper_count)
+        search = urls.build_search(search_term, retmax=str(paper_count))
 
         # Get associated IDs
         ids = urls.get_ids(search)
@@ -99,10 +101,14 @@ def collect_prs(search_term, start_date, end_date, pr_count=500):
 
     Parameters
     ----------
-    pr_count : str
+    search_term : str
+        Term to search for.
+    start_date : datetime.date
+        Start date for PRs to be collected.
+    end_date : datetime.date
+        End date for PRs to be collected.
+    pr_count : int
         Number of press releases to be collected and saved
-    db_url : str
-        Base URL from which to begin the search for individual press release links (preset to NIH db)
 
     Notes
     -----
