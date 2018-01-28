@@ -1,96 +1,13 @@
-"""Functions for saving and loading data into json file format."""
+"""Functions for data management, and saving/loading for the consc project."""
 
-import json
 import os
-import datetime
-
-from bs4 import BeautifulSoup
+import json
 from shutil import copy2
 
-import consc.base as base
-from consc.requester import Requester
+from consc.base import Paper, Press_Release
 
-##
-##
-
-def scrape_paper_data(url, path, retstart=0):
-    """Retrieve the paper from PubMed and extract the info.
-
-    Parameters
-    ----------
-    url : str
-        Fetch URL for the desired papers
-    path : str
-        Path to the save location for scraped data
-    ret_start : int
-        An integer for keeping track of the saving index (so papers don't get saved over others if using history)
-    """
-
-    # Initialize Requester object for URL requests
-    req = Requester()
-
-    # Use Requester() object to open the paper URL
-    art_page = req.get_url(url)
-
-    # Get paper into a more convenient format for info extraction
-    page_soup = BeautifulSoup(art_page.content, 'lxml')
-
-    # Pull out articles
-    articles = page_soup.find_all('pubmedarticle')
-
-    # Loop through articles
-    for ind, article in enumerate(articles):
-
-        # For each article, pull the ID and extract relevant info
-        art_id = article.find('articleid', idtype='pubmed').text
-        paper = base.Paper(art_id)
-        paper.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-        paper.extract_add_info(article)
-
-        # Ensure all attributes are of the correct type
-        paper._check_type()
-
-        # Save paper object to JSON file
-        outfile = '{:04d}.json'.format(ind+retstart)
-        save(path, outfile, paper)
-
-    # Close the URL request
-    req.close()
-
-
-def scrape_pr_data(url, path):
-    """Retrieve the press release from Eurekalert and extract the info.
-
-    Parameters
-    ----------
-    url : str
-        Fetch URL for the desired press release
-    path : str
-        Path to the save location for scraped data
-    """
-
-    # Initialize Requester object for URL requests
-    req = Requester()
-
-    # Use Requester() to open the press release URL
-    art_page = req.get_url(url)
-
-    # Get press release into a more convenient format for info extraction
-    page_soup = BeautifulSoup(art_page.content, 'lxml')
-
-    # Initialize a press release object to store the scraped data and extract info
-    pr = base.Press_Release(url)
-    pr.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    pr.extract_add_info(page_soup)
-
-    # Close the URL request
-    req.close()
-
-    # Ensure all attributes are of the correct type
-    pr._check_type()
-
-    return(pr)
-
+###################################################################################################
+###################################################################################################
 
 def build_path(data_type, search_term, batch=None, root_dir='Data/'):
     """Gives the path to the save locations of paper or pr objects
@@ -266,7 +183,7 @@ def load_folder(data_type, search_term, root_dir='Data/'):
                 pr = load_pr_json(path)
                 items.append(pr)
 
-
+    # NOTE: This seems old, is it needed at all?
     # # Initialize a list to store the paper or press release objects generated
     # items = [None] * len(files)
 
@@ -302,7 +219,7 @@ def load_paper_json(path):
         info_dict = json.load(file)
 
     # Populate the paper attributes
-    paper = base.Paper(info_dict['id'])
+    paper = Paper(info_dict['id'])
     paper.doi = info_dict['doi']
     paper.title = info_dict['title']
     paper.authors = info_dict['authors']
@@ -335,7 +252,7 @@ def load_pr_json(path):
         info_dict = json.load(file)
 
     # Populate the pr attributes
-    pr = base.Press_Release(info_dict['url'])
+    pr = Press_Release(info_dict['url'])
     pr.title = info_dict['title']
     pr.text = info_dict['text']
     pr.sentences = info_dict['sentences']

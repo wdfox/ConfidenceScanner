@@ -1,17 +1,24 @@
-'''Functions designed to collect all data starting with a single search term/database pairing'''
+"""Functions designed to collect all data starting with a single search term/database pairing.
 
-import os
+Notes
+-----
+- 'collect_papers' & 'collect_prs' are the public functions that should be used to launch scrapes.
+- Other functions are sub-functions that should not be launched independently.
+"""
+
 import time
 import random
+import datetime
+from bs4 import BeautifulSoup
 
-
-import consc.base as base
 import consc.urls as urls
 import consc.data as data
 import consc.crawl as crawl
 from consc.requester import Requester
+from consc.base import Paper, Press_Release
 
-
+###################################################################################################
+###################################################################################################
 
 def collect_papers(paper_count, search_term, use_hist=False):
     """Collects a given number of papers related to a given term
@@ -64,7 +71,7 @@ def collect_papers(paper_count, search_term, use_hist=False):
             art_url = urls.build_fetch(ids=None, use_hist=True, query_key=query_key, WebEnv=WebEnv, retstart=retstart, retmax=retmax)
 
             # Scrape and save data for each article into JSON
-            data.scrape_paper_data(art_url, path, retstart)
+            scrape_paper_data(art_url, path, retstart)
 
             # Increment retstart to get next batch of papers
             retstart += retmax
@@ -81,7 +88,7 @@ def collect_papers(paper_count, search_term, use_hist=False):
         art_url = urls.build_fetch(ids)
 
         # Scrape and save data for each article into JSON
-        data.scrape_paper_data(art_url, path)
+        scrape_paper_data(art_url, path)
 
     # Clear archived data after a successful scrape
     data.clear_archive()
@@ -126,7 +133,7 @@ def collect_prs(search_term, start_date, end_date, pr_count=500):
 
         # Extract the desired info from each press release and save to JSON
         for ind, url in enumerate(pr_urls):
-            pr = data.scrape_pr_data(url, path)
+            pr = scrape_pr_data(url, path)
             outfile = '{:04d}.json'.format(ind)
             data.save(path, outfile, pr)
 
@@ -137,3 +144,81 @@ def collect_prs(search_term, start_date, end_date, pr_count=500):
         # Increment the date to collect the following week's press releases
         scrape_start_date = scrape_start_date.replace(day=scrape_start_date.day+7)
 
+
+def scrape_paper_data(url, path, retstart=0):
+    """Retrieve the paper from PubMed and extract the info.
+
+    Parameters
+    ----------
+    url : str
+        Fetch URL for the desired papers
+    path : str
+        Path to the save location for scraped data
+    ret_start : int
+        An integer for keeping track of the saving index (so papers don't get saved over others if using history)
+    """
+
+    # Initialize Requester object for URL requests
+    req = Requester()
+
+    # Use Requester() object to open the paper URL
+    art_page = req.get_url(url)
+
+    # Get paper into a more convenient format for info extraction
+    page_soup = BeautifulSoup(art_page.content, 'lxml')
+
+    # Pull out articles
+    articles = page_soup.find_all('pubmedarticle')
+
+    # Loop through articles
+    for ind, article in enumerate(articles):
+
+        # For each article, pull the ID and extract relevant info
+        art_id = article.find('articleid', idtype='pubmed').text
+        paper = Paper(art_id)
+        paper.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        paper.extract_add_info(article)
+
+        # Ensure all attributes are of the correct type
+        paper._check_type()
+
+        # Save paper object to JSON file
+        outfile = '{:04d}.json'.format(ind+retstart)
+        save(path, outfile, paper)
+
+    # Close the URL request
+    req.close()
+
+
+def scrape_pr_data(url, path):
+    """Retrieve the press release from Eurekalert and extract the info.
+
+    Parameters
+    ----------
+    url : str
+        Fetch URL for the desired press release
+    path : str
+        Path to the save location for scraped data
+    """
+
+    # Initialize Requester object for URL requests
+    req = Requester()
+
+    # Use Requester() to open the press release URL
+    art_page = req.get_url(url)
+
+    # Get press release into a more convenient format for info extraction
+    page_soup = BeautifulSoup(art_page.content, 'lxml')
+
+    # Initialize a press release object to store the scraped data and extract info
+    pr = Press_Release(url)
+    pr.date = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    pr.extract_add_info(page_soup)
+
+    # Close the URL request
+    req.close()
+
+    # Ensure all attributes are of the correct type
+    pr._check_type()
+
+    return(pr)
