@@ -50,23 +50,49 @@ class Press_Release(Base):
 
         # Initialize URL attribute to the given URL
         self.url = url
-        # Initialize to store the organization which published the release
-        self.source = str()
+
+        # Add PR specific data attributes
+        self.institution = str()
+        self.description = str()
+        self.keywords = list()
+        self.funder = str()
+        self.journal = str()
+        self.meeting = str()
+        self.region = str()
+
+        self.source_link = str()
+        self.article_link = str()
 
 
-    def __dict__(self):
-        """Creates a dictionary to store the pr object's attributes."""
+    def as_dict(self):
+        """Returns a dictionary that stores the pr object's attributes."""
 
-        return {
+        base_dict = super().as_dict()
+        base_dict.update({
             'url' : self.url,
-            'title' : self.title,
-            'text' : self.text,
-            #'sentences' : self.sentences,
-            #'words' : self.words,
-            'source' : self.source,
-            'year' : self.year,
-            'date' : self.date
-            }
+            'institution' : self.institution,
+            'description' : self.description,
+            'keywords' : self.keywords,
+            'funder' : self.funder,
+            'journal' : self.journal,
+            'meeting' : self.meeting,
+            'region' : self.region,
+            'source_link' : self.source_link,
+            'article_link' : self.article_link
+            })
+
+        return base_dict
+
+        # return {
+
+        #     'title' : self.title,
+        #     'text' : self.text,
+        #     #'sentences' : self.sentences,
+        #     #'words' : self.words,
+        #     #'source' : self.source,
+        #     'year' : self.year,
+        #     'date' : self.date
+        #     }
 
 
     def extract_add_info(self, article):
@@ -85,11 +111,17 @@ class Press_Release(Base):
         """
 
         # Set attributes to be the extracted info from press release.
-        self.title = article.find('meta', property='og:title')['content']
-        self.source = article.find('meta', property='og:site_name')['content']
-        #self.year = int(article.find('meta', property='article:published_time')['content'][0:4])
-        self.text = _process_pr(article)
-        #self.text, self.sentences, self.words = _process_pr(article)
+        self.title = _process_title(article.find('title'))
+        self.institution = _get_content(article.find('meta', {'name':'institution'}))
+        self.description = _get_content(article.find('meta', {'name':'description'}))
+        self.date = _get_content(article.find('meta', {'name':'date'}))
+        self.funder = _get_content(article.find('meta', {'name':'funder'}))
+        self.journal = _get_content(article.find('meta', {'name':'journal'}))
+        self.meeting = _get_content(article.find('meta', {'name':'meeting'}))
+        self.region = _get_content(article.find('meta', {'name':'region'}))
+        self.keywords = _process_keywords(_get_content(article.find('meta', {'name':'keywords'})))
+        self.text = _process_pr_text(article)
+        self.source_link, self.article_link = _find_links(article.find_all('h4'))
 
 
     def _check_type(self):
@@ -104,8 +136,42 @@ class Press_Release(Base):
 ###################################################################################################
 ###################################################################################################
 
+def _find_links(tags):
+    """Search for source & article links, given a list of h4 tags."""
+
+    source_link = None
+    article_link = None
+
+    for tag in tags:
+
+        if 'Original Source' in tag:
+            source_link = tag.find_next('a')['href']
+
+        if 'Related Journal Article' in tag:
+            article_link = tag.find_next('a')['href']
+
+    return source_link, article_link
+
 @CatchNone
-def _process_pr(article):
+def _process_title(title):
+    """Process an extracted title."""
+
+    return title.get_text().split('|')[0][:-1]
+
+@CatchNone
+def _get_content(tag):
+    """Return the content of a provided tag."""
+
+    return tag['content']
+
+@CatchNone
+def _process_keywords(kws):
+    """Process a string list of keywords."""
+
+    return kws.split(',')
+
+@CatchNone
+def _process_pr_text(article):
     """Set pr text to lower case, removes stopwords and punctuation.
 
     Parameters
@@ -128,6 +194,12 @@ def _process_pr(article):
     tags = article.find_all(name='p', class_=False)
 
     for tag in tags:
+
+        # Heuristic to ignore text section that we don't want
+        #  Drops any with a bold section, including featured meeting, and image descriptions
+        #     Note: doesn't all image descriptions, depending on organization - needs checking.
+        if tag.find('strong'):
+            continue
 
         tag = tag.get_text()
 
