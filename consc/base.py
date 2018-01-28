@@ -21,8 +21,6 @@ class Base(object):
         Text in the body of the press release or paper.
     year : str
         Year of publication.
-    req : Requester()
-        Object for handling URL requests.
     date : str
         Date that the paper or press release was collected.
     """
@@ -33,12 +31,22 @@ class Base(object):
         # Initialize to store basic data pulled from papers/press releases
         self.title = str()
         self.text = str()
-        self.sentences = list()
-        self.words = list()
+        self.date = str()
         self.year = str()
 
-        # Initialize for date that data is collected
-        self.date = str()
+        self.sentences = list()
+        self.words = list()
+
+
+    def as_dict(self):
+        """Returns a dictionary that stores the base object's attributes."""
+
+        return {
+            'title' : self.title,
+            'text' : self.text,
+            'year' : self.year,
+            'date' : self.date
+        }
 
 
     def remove_special_characters(self):

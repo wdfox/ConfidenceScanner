@@ -54,21 +54,31 @@ class Paper(Base):
         self.journal = tuple()
 
 
-    def __dict__(self):
-        """Creates a dictionary to store the paper object's attributes."""
+    def as_dict(self):
+        """Return a dictionary to store the paper object's attributes."""
 
-        return {
+        base_dict = super().as_dict()
+        base_dict.update({
             'id' : self.id,
             'doi' : self.doi,
-            'title' : self.title,
-            'text' : self.text,
-            #'sentences' : self.sentences,
-            #'words' : self.words,
             'authors' : self.authors,
             'journal' : self.journal,
-            'year' : self.year,
-            'date' : self.date
-            }
+            })
+
+        return base_dict
+
+        # return {
+        #     'id' : self.id,
+        #     'doi' : self.doi,
+        #     'title' : self.title,
+        #     'text' : self.text,
+        #     #'sentences' : self.sentences,
+        #     #'words' : self.words,
+        #     'authors' : self.authors,
+        #     'journal' : self.journal,
+        #     'year' : self.year,
+        #     'date' : self.date
+        #     }
 
 
     def extract_add_info(self, article):
@@ -85,11 +95,14 @@ class Paper(Base):
         """
 
         # Set attributes to be the extracted info from PubMed article.
-        self.doi = article.find('articleid', idtype='doi').text
+        #self.doi = article.find('articleid', idtype='doi').text
         self.title = check_extract(article, 'articletitle')
         self.authors = _process_authors(article.authorlist)
         self.journal = check_extract(article, 'title'), check_extract(article, 'isoabbreviation')
+
+        #self.date =
         #self.year = int(article.datecreated.year.text)
+
         self.text = _process_paper(article.find_all('abstracttext'))
         #self.text, self.sentences, self.words = _process_paper(article.find_all('abstracttext'))
 
