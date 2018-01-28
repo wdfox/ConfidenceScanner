@@ -1,4 +1,4 @@
-"""  """
+"""Object for storing and working with Paper documents."""
 
 from consc.base import Base
 from consc.utils import CatchNone, check_extract
@@ -95,13 +95,15 @@ class Paper(Base):
         """
 
         # Set attributes to be the extracted info from PubMed article.
-        #self.doi = article.find('articleid', idtype='doi').text
         self.title = check_extract(article, 'articletitle')
         self.authors = _process_authors(article.authorlist)
         self.journal = check_extract(article, 'title'), check_extract(article, 'isoabbreviation')
 
-        #self.date =
-        #self.year = int(article.datecreated.year.text)
+        self.doi = _process_doi(article.find('articleid', idtype='doi'))
+        #print(self.doi)
+        #self.doi = article.find('articleid', {'idtype' : 'doi'}).text
+
+        self.date = _process_date(article.find('articledate'))
 
         self.text = _process_paper(article.find_all('abstracttext'))
         #self.text, self.sentences, self.words = _process_paper(article.find_all('abstracttext'))
@@ -123,6 +125,17 @@ class Paper(Base):
 
 ###################################################################################################
 ###################################################################################################
+
+@CatchNone
+def _process_doi(tag):
+
+    return tag.text
+
+@CatchNone
+def _process_date(tag):
+    """Process date."""
+
+    return str(tag.year.get_text()) + '-' + str(tag.month.get_text()) + '-' + str(tag.day.get_text())
 
 @CatchNone
 def _process_paper(abstract_tags):
