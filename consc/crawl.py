@@ -1,4 +1,4 @@
-'''Functions for using Selenium Webdriver for webpage emulation and scraping'''
+"""Functions for using Selenium Webdriver for webpage emulation and scraping."""
 
 import time
 import random
@@ -7,8 +7,8 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
-##
-##
+###################################################################################################
+###################################################################################################
 
 def pr_crawl(pr_count, search_term, start_date, end_date):
 
@@ -28,7 +28,9 @@ def pr_crawl(pr_count, search_term, start_date, end_date):
     crawl_base = 'https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0='
     crawl_middle = '&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=&inthe=604800&dt=ba'
 
-    crawl_url = crawl_base + search_term + crawl_middle + '&amo=' + start_month + '&ady=' + start_day + '&ayr=' + start_year + '&bmo=' + end_month + '&bdy=' + end_day + '&byr=' + end_year + '&op6=&fl6=keywords%3A&ty6=p&rf=1'
+    crawl_url = crawl_base + search_term + crawl_middle + '&amo=' + start_month \
+                + '&ady=' + start_day + '&ayr=' + start_year + '&bmo=' + end_month \
+                + '&bdy=' + end_day + '&byr=' + end_year + '&op6=&fl6=keywords%3A&ty6=p&rf=1'
 
     # Go to first page containing press releases
     driver.get(crawl_url)
@@ -93,8 +95,7 @@ def pr_crawl(pr_count, search_term, start_date, end_date):
 
     return pr_links
 
-
-
+# NOTE: OLD - is any of this needed?
 # pr_crawl(27, 'https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=&inthe=604800&dt=ba&amo=1&ady=9&ayr=2017&bmo=1&bdy=16&byr=2017&op6=&fl6=keywords%3A&ty6=p&rf=1')
 
 # driver = webdriver.Safari()
@@ -103,7 +104,5 @@ def pr_crawl(pr_count, search_term, start_date, end_date):
 # next_page = driver.find_element(By.LINK_TEXT, '10')
 # print("Next page element exists")
 
-# NOTE:
 # Format for 1-9: ' x'
 # Format for 10- : 'xx'
-

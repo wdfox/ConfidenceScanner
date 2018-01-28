@@ -2,7 +2,7 @@
 
 import os
 import json
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import BeautifulSoup
 
 from consc.requester import Requester
 
@@ -257,17 +257,5 @@ def get_use_hist(search_url):
 
     return count, query_key, WebEnv
 
-
-
-
-
-
-
-
 # https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=research&dt=in&inthe=604800&amo=1&ady=8&ayr=2018&bmo=1&bdy=15&byr=2018&op6=&fl6=keywords%3A&ty6=p&rf=0
 # https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=&dt=in&inthe=604800&amo=1&ady=8&ayr=2018&bmo=1&bdy=15&byr=2018&op6=&fl6=keywords%3A&ty6=p&rf=0
-
-
-
-
-

@@ -16,7 +16,8 @@ import consc.urls as urls
 import consc.data as data
 import consc.crawl as crawl
 from consc.requester import Requester
-from consc.base import Paper, Press_Release
+from consc.paper import Paper
+from consc.press_release import Press_Release
 
 ###################################################################################################
 ###################################################################################################
