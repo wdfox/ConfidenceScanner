@@ -2,13 +2,18 @@
 
 import os
 import json
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import BeautifulSoup
 
 from consc.requester import Requester
 
-# URL for searching the PubMed online database
-base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+###################################################################################################
+###################################################################################################
 
+# URL for searching the PubMed online database
+BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+
+###################################################################################################
+###################################################################################################
 
 def build_search(search_term, retmax, use_hist=False, db="db=pubmed"):
     """Build URL to search for papers associated with certain keywords.
@@ -41,13 +46,14 @@ def build_search(search_term, retmax, use_hist=False, db="db=pubmed"):
         use_hist = ""
 
     # Join all parts of the URL into a usable search
-    search_base = base_url + "esearch.fcgi?"
+    search_base = BASE_URL + "esearch.fcgi?"
     search = search_base + db + "&term=" + search_term + use_hist + "&retmax=" + retmax
 
     return search
 
 
-def build_fetch(ids, use_hist=False, query_key=None, WebEnv=None, retstart=None, retmax=None, retmode="&retmode=xml", db="db=pubmed"):
+def build_fetch(ids, use_hist=False, query_key=None, WebEnv=None, retstart=None,
+                retmax=None, retmode="&retmode=xml", db="db=pubmed"):
     """Function for finding specific papers given their IDs
 
     Parameters
@@ -79,7 +85,7 @@ def build_fetch(ids, use_hist=False, query_key=None, WebEnv=None, retstart=None,
     - Fetch built according the specifications of the PubMed URL API
     """
 
-    fetch_base = base_url + 'efetch.fcgi?'
+    fetch_base = BASE_URL + 'efetch.fcgi?'
 
     # Using history
     if use_hist:
@@ -90,7 +96,8 @@ def build_fetch(ids, use_hist=False, query_key=None, WebEnv=None, retstart=None,
 
         # Otherwise, build the fetch URL
         else:
-            fetch = fetch_base + db + '&query_key=' + query_key + '&WebEnv=' + WebEnv + retmode + '&retstart=' + str(retstart) + '&retmax=' + str(retmax)
+            fetch = fetch_base + db + '&query_key=' + query_key + '&WebEnv=' + WebEnv \
+            + retmode + '&retstart=' + str(retstart) + '&retmax=' + str(retmax)
 
     # Using IDs
     elif not use_hist:
@@ -128,7 +135,7 @@ def build_info(db='db=pubmed', retmode='retmode=xml'):
     """
 
     # Build the EInfo URL
-    info_base = base_url + 'einfo.fcgi?'
+    info_base = BASE_URL + 'einfo.fcgi?'
     info = info_base + db + '&' + retmode
 
     return info
@@ -257,17 +264,5 @@ def get_use_hist(search_url):
 
     return count, query_key, WebEnv
 
-
-
-
-
-
-
-
 # https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=research&dt=in&inthe=604800&amo=1&ady=8&ayr=2018&bmo=1&bdy=15&byr=2018&op6=&fl6=keywords%3A&ty6=p&rf=0
 # https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0=aging&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=&dt=in&inthe=604800&amo=1&ady=8&ayr=2018&bmo=1&bdy=15&byr=2018&op6=&fl6=keywords%3A&ty6=p&rf=0
-
-
-
-
-
