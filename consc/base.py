@@ -37,9 +37,6 @@ class Base(object):
         self.words = list()
         self.year = str()
 
-        # Requester object for handling URL objects
-        self.req = Requester()
-
         # Initialize for date that data is collected
         self.date = str()
 
