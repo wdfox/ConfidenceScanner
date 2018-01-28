@@ -38,6 +38,3 @@ def sent_subjectivity(text):
 	result = sentim_analyzer.classify(tokenized_text)
 
 	return result
-
-# train()
-# print(sent_subjectivity('I am a huge nerd'))
