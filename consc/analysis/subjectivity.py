@@ -38,3 +38,31 @@ def sent_subjectivity(text):
 	result = sentim_analyzer.classify(tokenized_text)
 
 	return result
+
+
+def doc_subjectivity(document):
+
+	subj = 0
+	obj = 0
+
+	for sent in document.sentences:
+		sent_subj = sent_subjectivity(sent)
+
+		if sent_subjectivity == 'subj':
+			subj += 1
+		elif sent_subjectivity == 'obj':
+			obj += 1
+
+	doc_subjectivity = subj - obj
+
+	return doc_subjectivity
+
+
+def folder_subjectivity(data_type, search_term):
+
+	docs = load_folder(data_type, search_term)
+
+	subjectivities = [doc_subjectivity(doc) for doc in docs]
+
+	return subjectivities
+
