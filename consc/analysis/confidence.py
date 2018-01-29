@@ -1,20 +1,32 @@
 ''' LIWC Confidence Method '''
 
-confidence_words = {
-					'relate' : 0, 'relation' : 0,
-					'correlat' : 0, 'indicat' : 0,
-					'point' : 0, 'represent' : 0,
-					'observ' : 0,
-					'corroborat' : 0,
-					'conclud' : 0,
-					'describe' : 0, 'justif' : 0,
-					'recogniz' : 0, 'clarify' : 0,
-					'illustrat' : 0, 'highlight' : 0, 'exhibit' : 0,
-					'determin' : 0, 'promis' : 0,
-					'certain' : 0, '''or -1 if uncertain''' 'decisive' : 0,
-					'possibl' : 0, # uncertain root,
-					'clear' : 0, '''clear and unclear''' 'agree' : 0, 'answer' : 0, # answer or unanswered
-					'deriv' : 0, 'new' : 0,
-					'creates' : 0,
-					'report' : 0, 'impact' : 0,
-					'novel' : 0 }
+high_con_file = open('../corpus/positive.txt', 'r')
+high_con_words = high_con_file.read().splitlines()
+
+low_con_file = open('../corpus/negative.txt', 'r')
+low_con_words = low_con_file.read().splitlines()
+
+def doc_confidence(document):
+
+	confidence = 0
+
+	for i in document.words:
+
+		for j in high_con_words:
+			if j in i:
+				confidence += 1
+
+		for k in low_con_words:
+			if k in i:
+				confidence -= 1
+
+	return confidence
+
+
+def folder_confidence(data_type, search_term):
+
+	docs = load_folder(data_type, search_term)
+
+	confidence = [doc_confidence(doc) for doc in docs]
+
+	return confidence
