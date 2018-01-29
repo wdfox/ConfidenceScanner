@@ -10,7 +10,7 @@ from consc.press_release import Press_Release
 ###################################################################################################
 ###################################################################################################
 
-def build_path(data_type, search_term, batch=None, root_dir='Data/'):
+def build_path(data_type, search_term, batch=None, root_dir='../Data/'):
     """Gives the path to the save locations of paper or pr objects
 
     Parameters
@@ -123,7 +123,7 @@ def save(path, outfile, data):
         json.dump(info_dict, outfile)
 
 
-def load_folder(data_type, search_term, root_dir='Data/'):
+def load_folder(data_type, search_term, root_dir='../Data/'):
     """Load paper or press release info from an entire directory for analysis
 
     Parameters
