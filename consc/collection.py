@@ -19,6 +19,8 @@ from consc.requester import Requester
 from consc.paper import Paper
 from consc.press_release import Press_Release
 
+from selenium import webdriver
+
 ###################################################################################################
 ###################################################################################################
 
@@ -103,7 +105,7 @@ def collect_papers(search_term, start_date=None, end_date=None, paper_count=5000
     #data.clear_archive()
 
 
-def collect_prs(search_term, start_date, end_date, pr_count=500):
+def collect_prs(search_term, start_date, end_date, driver, pr_count=500):
     """Collects a given number of press releases related to a given term
 
     Parameters
@@ -123,6 +125,8 @@ def collect_prs(search_term, start_date, end_date, pr_count=500):
     - Implement the whole save path deal as above
     """
 
+    # driver = webdriver.Safari()
+
     # Initialize the base URL for EurekAlert press releases
     db_url = 'http://www.eurekalert.org/'
 
@@ -133,13 +137,13 @@ def collect_prs(search_term, start_date, end_date, pr_count=500):
     while scrape_start_date < end_date:
 
         # End date for each batch is one week past the start date
-        scrape_end_date = scrape_start_date.replace(day=scrape_start_date.day+6)
+        scrape_end_date = scrape_start_date + datetime.timedelta(days=6)
 
         # Create a location to save the collected papers
         path = data.build_path(data_type='PRs', search_term=search_term, batch=str(scrape_start_date))
 
         # Retrieve press release URLS
-        pr_links = crawl.pr_crawl(pr_count=pr_count, search_term=search_term, start_date=scrape_start_date, end_date=scrape_end_date)
+        pr_links = crawl.pr_crawl(driver, pr_count=pr_count, search_term=search_term, start_date=scrape_start_date, end_date=scrape_end_date)
 
         # Create a list of press release URLs to be saved
         pr_urls = [db_url+link for link in pr_links]
@@ -155,7 +159,12 @@ def collect_prs(search_term, start_date, end_date, pr_count=500):
             time.sleep(sleep_time)
 
         # Increment the date to collect the following week's press releases
-        scrape_start_date = scrape_start_date.replace(day=scrape_start_date.day+7)
+        scrape_start_date = scrape_start_date + datetime.timedelta(days=7)
+
+        time.sleep(1)
+
+    # End the browser instance
+    # driver.close()
 
 
 def scrape_paper_data(url, path, retstart=0):
