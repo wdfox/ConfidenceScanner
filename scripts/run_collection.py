@@ -9,12 +9,12 @@ from consc.collection import collect_papers, collect_prs
 # Set search terms
 #TERMS = ['dementia', 'autism']
 #COUNT = 500
-TERMS = ['biology']
-COUNT = 5
+TERMS = ['aging']
+COUNT = 30
 
 # Set the start & end date
 START_DATE = datetime.date(year=2017, month=1, day=1)
-END_DATE = datetime.date(year=2017, month=1, day=7)
+END_DATE = datetime.date(year=2017, month=1, day=14)
 #START_DATE = datetime.date(year=2017, month=1, day=1)
 #END_DATE = datetime.date(year=2017, month=12, day=31)
 

@@ -1,10 +1,9 @@
 '''Test cases for Com_Scanner classes and functions'''
 
-import base
-import requester
-import urls
-import data
-from scripts.scripts import collect_papers, collect_prs
+import consc.base
+import consc.requester
+import consc.urls
+import consc.data
 
 import datetime
 from bs4 import BeautifulSoup
@@ -159,7 +158,7 @@ from bs4 import BeautifulSoup
 # paper = data.load_paper_json(paper_path)
 # print(paper.id)
 
-paper_list = data.load_folder('Papers', 'autism')
+# paper_list = consc.data.load_folder('Papers', 'autism')
 # print(paper_list)
 # print(len(paper_list))
 
