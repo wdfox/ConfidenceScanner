@@ -90,7 +90,7 @@ def clear_archive():
     """Deletes all archived files"""
 
     # Create the path to the saved data archive
-    archive = os.path.join('Data', 'Archive')
+    archive = os.path.join('..', 'Data', 'Archive')
 
     # Delete all files in the archive
     for file in os.listdir(archive):
