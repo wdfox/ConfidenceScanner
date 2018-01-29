@@ -5,6 +5,7 @@ authentic
 causal
 cause
 clearly
+conclusive
 confirm
 connect
 convinc
@@ -21,6 +22,7 @@ does
 doubtless
 endorse
 establish
+ensure
 explain
 expose
 find
@@ -29,7 +31,6 @@ guarantee
 identif
 important
 improve
-insure
 invent
 led
 lead
@@ -56,4 +57,4 @@ unequivocal
 unquestionabl
 unveil
 valid
-verify
+verif
