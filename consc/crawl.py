@@ -10,10 +10,10 @@ from selenium.webdriver.common.by import By
 ###################################################################################################
 ###################################################################################################
 
-def pr_crawl(pr_count, search_term, start_date, end_date):
+def pr_crawl(driver, pr_count, search_term, start_date, end_date):
 
     # Initialize a webdriver so Selenium can emulate the page
-    driver = webdriver.Safari()
+    # driver = webdriver.Safari()
 
     # Parse out individual components from given start dates for search
     start_day = str(start_date.day)
@@ -26,7 +26,7 @@ def pr_crawl(pr_count, search_term, start_date, end_date):
 
     # Creat the search URL based on the term and dates desired
     crawl_base = 'https://srch.eurekalert.org/e3/query.html?qs=EurekAlert&pw=100.101%25&op0=%2B&fl0=&ty0=w&tx0='
-    crawl_middle = '&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=&inthe=604800&dt=ba'
+    crawl_middle = '&op1=%2B&fl1=institution%3A&ty1=p&tx1=&op2=%2B&fl2=journal%3A&ty2=p&tx2=&op3=%2B&fl3=meeting%3A&ty3=p&tx3=&op4=%2B&fl4=region%3A&ty4=p&tx4=&op5=%2B&fl5=type%3A&ty5=p&tx5=research&inthe=604800&dt=ba'
 
     crawl_url = crawl_base + search_term + crawl_middle + '&amo=' + start_month \
                 + '&ady=' + start_day + '&ayr=' + start_year + '&bmo=' + end_month \
@@ -50,7 +50,10 @@ def pr_crawl(pr_count, search_term, start_date, end_date):
         page = driver.page_source
         page_soup = BeautifulSoup(page, 'lxml')
         results = page_soup.select(".results")
-        links = results[0].find_all("a")
+        try:
+            links = results[0].find_all("a")
+        except:
+            links = []
 
         i = 0
         for link in links[1:]:
@@ -65,7 +68,7 @@ def pr_crawl(pr_count, search_term, start_date, end_date):
                     page_links.append('')
 
             elif len(pr_links) == pr_count:
-                driver.close()
+                # driver.close()
                 print(len(pr_links))
                 return pr_links
 
@@ -91,7 +94,7 @@ def pr_crawl(pr_count, search_term, start_date, end_date):
             pages_continue = False
 
     # End the browser instance
-    driver.close()
+    # driver.close()
 
     return pr_links
 
@@ -106,3 +109,5 @@ def pr_crawl(pr_count, search_term, start_date, end_date):
 
 # Format for 1-9: ' x'
 # Format for 10- : 'xx'
+
+
