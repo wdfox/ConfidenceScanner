@@ -66,17 +66,19 @@ def liu_polarity(document, vote=True, normalize=False):
 	pos_sentences = 0
 	neg_sentences = 0
 
+	doc_polarity = 0
+
 	for sent in document.sentences:
 		if vote:
 			sent_polarity = liu_hu_lexicon(sent)[0]
+			if sent_polarity == 'pos':
+				pos_sentences += 1
+			elif sent_polarity == 'neg':
+				neg_sentences += 1
+			doc_polarity = pos_sentences - neg_sentences
 		else:
 			sent_polarity = liu_hu_lexicon(sent)[1]
-		if sent_polarity == 'pos':
-			pos_sentences += 1
-		elif sent_polarity == 'neg':
-			neg_sentences += 1
-
-	doc_polarity = pos_sentences - neg_sentences
+			doc_polarity += sent_polarity
 
 	if normalize:
 		doc_polarity = doc_polarity / float(len(document.sentences))
