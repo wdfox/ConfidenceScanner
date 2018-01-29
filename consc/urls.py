@@ -15,7 +15,7 @@ BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 ###################################################################################################
 ###################################################################################################
 
-def build_search(search_term, retmax, use_hist=False, db="db=pubmed"):
+def build_search(search_term, retmax, use_hist=False, db="db=pubmed", mindate=None, maxdate=None):
     """Build URL to search for papers associated with certain keywords.
 
     Parameters
@@ -45,9 +45,14 @@ def build_search(search_term, retmax, use_hist=False, db="db=pubmed"):
     else:
         use_hist = ""
 
+    if mindate and maxdate:
+        date = "&datetype=pdat&mindate=" + str(mindate) + "&maxdate=" + str(maxdate)
+    else:
+        date = ""
+
     # Join all parts of the URL into a usable search
     search_base = BASE_URL + "esearch.fcgi?"
-    search = search_base + db + "&term=" + search_term + use_hist + "&retmax=" + retmax
+    search = search_base + db + "&term=" + search_term + date + use_hist + "&retmax=" + retmax
 
     return search
 

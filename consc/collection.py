@@ -22,7 +22,7 @@ from consc.press_release import Press_Release
 ###################################################################################################
 ###################################################################################################
 
-def collect_papers(search_term, paper_count, use_hist=False):
+def collect_papers(search_term, start_date=None, end_date=None, paper_count=5000, use_hist=False):
     """Collects a given number of papers related to a given term
 
     Parameters
@@ -48,6 +48,10 @@ def collect_papers(search_term, paper_count, use_hist=False):
     # Save a header file with the database info
     urls.save_db_info(path)
 
+    # Formate dates
+    start_date = str(start_date.year) + '/' + str(start_date.month) + '/' + str(start_date.day)
+    end_date = str(end_date.year) + '/' + str(end_date.month) + '/' + str(end_date.day)
+
     # Using history
     if use_hist:
 
@@ -56,7 +60,8 @@ def collect_papers(search_term, paper_count, use_hist=False):
         retmax = 10
 
         # Build a search URL for desired IDs, using history
-        search = urls.build_search(search_term, retmax=str(paper_count), use_hist=True)
+        search = urls.build_search(search_term, retmax=str(paper_count), use_hist=True,
+                                   mindate=start_date, maxdate=end_date)
 
         # Extract the necessary info from search page to make fetch calls
         use_hist_info = urls.get_use_hist(search)
