@@ -3,8 +3,8 @@
 import pkg_resources as pkg
 from consc.data import load_folder
 
-##
-##
+###################################################################################################
+###################################################################################################
 
 def load_corpus_words(file_name):
     """   """
@@ -23,6 +23,7 @@ LOW_CON_WORDS = load_corpus_words('negative')
 
 
 def doc_confidence(document, norm=False):
+    """   """
 
     confidence = 0
 
@@ -31,10 +32,12 @@ def doc_confidence(document, norm=False):
         for j in HIGH_CON_WORDS:
             if j in i:
                 confidence += 1
+                continue
 
         for k in LOW_CON_WORDS:
             if k in i:
                 confidence -= 1
+                continue
 
     if norm:
         # The try is in case of division by zero
@@ -48,6 +51,7 @@ def doc_confidence(document, norm=False):
 
 
 def folder_confidence(data_type, search_term, norm=False):
+    """   """
 
     docs = load_folder(data_type, search_term)
 
