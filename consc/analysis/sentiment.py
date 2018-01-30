@@ -30,10 +30,10 @@ def liu_hu_lexicon(sentence, plot=False):
 		elif word in opinion_lexicon.negative():
 			neg_words += 1
 			#y.append(-1) # negative
-		else:
+		# else:
 			#y.append(0) # neutral
 
-	if plot == True:
+	if plot:
 		x = list(range(len(tokenized_sent))) # x axis for the plot
 		y = []
 		_show_plot(x, y, x_labels=tokenized_sent, y_labels=['Negative', 'Neutral', 'Positive'])
