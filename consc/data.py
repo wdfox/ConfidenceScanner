@@ -237,7 +237,7 @@ def load_paper_json(path, proc_text=True):
 
     if proc_text:
         paper.tokenize_sentences()
-        paper.tokenize_words()
+        # paper.tokenize_words()
 
     return(paper)
 
@@ -281,6 +281,6 @@ def load_pr_json(path, proc_text=True):
 
     if proc_text:
         pr.tokenize_sentences()
-        pr.tokenize_words()
+        # pr.tokenize_words()
 
     return(pr)

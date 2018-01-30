@@ -1,53 +1,55 @@
 ''' Sentiment Analysis with Liu Hu Lexicon '''
 
 from consc.data import load_folder
+from nltk.corpus import opinion_lexicon
 from nltk.sentiment.util import _show_plot
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 
 def liu_hu_lexicon(sentence, plot=False):
-    """
-    Sentiment classification using Liu and Hu opinion lexicon.
-    This function simply counts the number of positive, negative and neutral words
-    in the sentence and classifies it depending on which polarity is more represented.
-    Words that do not appear in the lexicon are considered as neutral.
+	"""
+	Sentiment classification using Liu and Hu opinion lexicon.
+	This function simply counts the number of positive, negative and neutral words
+	in the sentence and classifies it depending on which polarity is more represented.
+	Words that do not appear in the lexicon are considered as neutral.
 
-    :param sentence: a sentence whose polarity has to be classified.
-    :param plot: if True, plot a visual representation of the sentence polarity.
-    """
-    from nltk.corpus import opinion_lexicon
-    from nltk.tokenize import treebank
+	:param sentence: a sentence whose polarity has to be classified.
+	:param plot: if True, plot a visual representation of the sentence polarity.
+	"""
+	# from nltk.corpus import opinion_lexicon
+	# from nltk.tokenize import treebank
 
-    tokenizer = treebank.TreebankWordTokenizer()
-    pos_words = 0
-    neg_words = 0
-    tokenized_sent = [word.lower() for word in tokenizer.tokenize(sentence)]
+	# tokenizer = treebank.TreebankWordTokenizer()
+	pos_words = 0
+	neg_words = 0
+	# tokenized_sent = [word.lower() for word in tokenizer.tokenize(sentence)]
 
-    for word in tokenized_sent:
-        if word in opinion_lexicon.positive():
-            pos_words += 1
-            #y.append(1) # positive
-        elif word in opinion_lexicon.negative():
-            neg_words += 1
-            #y.append(-1) # negative
-        else:
-            #y.append(0) # neutral
+	# for word in tokenized_sent:
+	for word in sentence:
+		if word in opinion_lexicon.positive():
+			pos_words += 1
+			#y.append(1) # positive
+		elif word in opinion_lexicon.negative():
+			neg_words += 1
+			#y.append(-1) # negative
+		# else:
+			#y.append(0) # neutral
 
-    if plot == True:
-        x = list(range(len(tokenized_sent))) # x axis for the plot
-        y = []
-        _show_plot(x, y, x_labels=tokenized_sent, y_labels=['Negative', 'Neutral', 'Positive'])
+	if plot:
+		x = list(range(len(tokenized_sent))) # x axis for the plot
+		y = []
+		_show_plot(x, y, x_labels=tokenized_sent, y_labels=['Negative', 'Neutral', 'Positive'])
 
-    polarity = pos_words - neg_words
+	polarity = pos_words - neg_words
 
-    return polarity
+	return polarity
 
-    # if pos_words > neg_words:
-    #   return 'pos', polarity
-    # elif pos_words < neg_words:
-    #   return polarity
-    # elif pos_words == neg_words:
-    #   return polarity
+	# if pos_words > neg_words:
+	# 	return 'pos', polarity
+	# elif pos_words < neg_words:
+	# 	return polarity
+	# elif pos_words == neg_words:
+	# 	return polarity
 
 
 def liu_polarity(document, vote=True, normalize=False):
@@ -69,6 +71,7 @@ def liu_polarity(document, vote=True, normalize=False):
 
     doc_polarity = 0
 
+<<<<<<< HEAD
     for sent in document.sentences:
         if vote:
             sent_polarity = liu_hu_lexicon(sent)
@@ -80,6 +83,19 @@ def liu_polarity(document, vote=True, normalize=False):
         else:
             sent_polarity = liu_hu_lexicon(sent)[1]
             doc_polarity += sent_polarity
+=======
+	for sent in document.tokens:
+		if vote:
+			sent_polarity = liu_hu_lexicon(sent)
+			if sent_polarity > 0:
+				pos_sentences += 1
+			elif sent_polarity < 0:
+				neg_sentences += 1
+			doc_polarity = pos_sentences - neg_sentences
+		else:
+			sent_polarity = liu_hu_lexicon(sent)[1]
+			doc_polarity += sent_polarity
+>>>>>>> c5827576e5576115ce195e3c4d0e6df6d498fce3
 
     if normalize:
         doc_polarity = doc_polarity / float(len(document.sentences))

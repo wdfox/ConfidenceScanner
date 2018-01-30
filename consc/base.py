@@ -34,6 +34,7 @@ class Base(object):
         self.date = str()
 
         self.sentences = list()
+        self.tokens = list()
         self.words = list()
 
 
@@ -65,6 +66,7 @@ class Base(object):
         """Tokenize the full text into sentences."""
 
         self.sentences = nltk.sent_tokenize(self.text)
+        self.tokens = [nltk.word_tokenize(sentence) for sentence in self.sentences]
 
 
     def tokenize_words(self):
