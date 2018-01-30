@@ -226,15 +226,14 @@ def load_paper_json(path, proc_text=True):
 
     # Populate the paper attributes
     paper = Paper(info_dict['id'])
-    paper.doi = info_dict['doi']
+
     paper.title = info_dict['title']
+    paper.text = info_dict['text']
+    paper.date = info_dict['date']
+
+    paper.doi = info_dict['doi']
     paper.authors = info_dict['authors']
     paper.journal = info_dict['journal']
-    paper.text = info_dict['text']
-    paper.year = info_dict['year']
-    paper.date = info_dict['date']
-    #paper.sentences = info_dict['sentences']
-    #paper.words = info_dict['words']
 
     if proc_text:
         paper.tokenize_sentences()
@@ -265,13 +264,20 @@ def load_pr_json(path, proc_text=True):
 
     # Populate the pr attributes
     pr = Press_Release(info_dict['url'])
+
     pr.title = info_dict['title']
     pr.text = info_dict['text']
-    pr.source = info_dict['source']
-    pr.year = info_dict['year']
     pr.date = info_dict['date']
-    #pr.sentences = info_dict['sentences']
-    #pr.words = info_dict['words']
+
+    pr.institution = info_dict['institution']
+    pr.description = info_dict['description']
+    pr.keywords = info_dict['keywords']
+    pr.funder = info_dict['funder']
+    pr.journal = info_dict['journal']
+    pr.meeting = info_dict['meeting']
+    pr.region = info_dict['region']
+    pr.source_link = info_dict['source_link']
+    pr.article_link = info_dict['article_link']
 
     if proc_text:
         pr.tokenize_sentences()
