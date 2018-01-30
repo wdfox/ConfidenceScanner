@@ -1,59 +1,67 @@
-"""  """
+""".  """
 
-import numpy as np
+import os
+
+import pandas as pd
 from textstat.textstat import textstatistics
 
 from consc.data import load_folder
-from consc.analysis.readability import fk_grade_group, smog_group, consensus_group, ar_group
 
 ##
 ##
 
 DAT_PATH = '/Users/tom/Documents/GitCode/Confidence_Scanner/Data/'
 
-with open('terms.txt', 'r') as terms_file:
-    TERMS = terms_file.read().splitlines()
+DAT_TYPES = ['Papers', 'PRs']
+
+# with open('terms.txt', 'r') as terms_file:
+#     TERMS = terms_file.read().splitlines()
+
+TERMS = ['vaccines', 'autism']
 
 ##
 ##
 
 def main():
 
-    for term in TERMS:
+    # Initialize textstat object
+    ts = textstatistics()
 
-        print('Currently Analyzing: ', term)
+    for dat_type in DAT_TYPES:
 
-        # Load the data
-        paper_dat = load_folder('Papers', term, DAT_PATH, proc_text=False)
-        press_dat = load_folder('PRs', term, DAT_PATH, proc_text=False)
+        print('Running ', dat_type)
 
-        # Drop any docs with empty text
-        paper_dat = [doc for doc in paper_dat if doc.text]
-        press_dat = [doc for doc in press_dat if doc.text]
+        # Initialize dataframe
+        df = pd.DataFrame(columns=['id', 'fk', 'smog', 'consen', 'ar'])
 
-        # Flesh-Kincaid Grade Score
-        fks_papers = fk_grade_group(paper_dat)
-        np.save('results/' + term + '_fk_papers', np.array(fks_papers))
-        fks_press = fk_grade_group(press_dat)
-        np.save('results/' + term + '_fk_press', np.array(fks_press))
+        for term in TERMS:
 
-        # # Smog Score
-        smog_papers = smog_group(paper_dat)
-        np.save('results/' + term + '_smog_papers', np.array(smog_papers))
-        smog_press = smog_group(press_dat)
-        np.save('results/' + term + '_smog_press', np.array(smog_press))
+            print('\tRunning ', term)
 
-        # # Consensus Score
-        consen_papers = consensus_group(paper_dat)
-        np.save('results/' + term + '_consen_papers', np.array(consen_papers))
-        consen_press = consensus_group(press_dat)
-        np.save('results/' + term + '_consen_press', np.array(consen_press))
+            # Load the data
+            docs = load_folder(dat_type, term, DAT_PATH, proc_text=False)
 
-        # # Automated Readability Score
-        ar_papers = ar_group(paper_dat)
-        np.save('results/' + term + '_ar_papers', np.array(ar_papers))
-        ar_press = ar_group(press_dat)
-        np.save('results/' + term + '_ar_press', np.array(ar_press))
+            for ind, doc in enumerate(docs):
+
+                # Skip any documents that have no text
+                if not doc.text:
+                    continue
+
+                # Calculate readability measures
+                fk = ts.flesch_kincaid_grade(doc.text)
+                smog = ts.smog_index(doc.text)
+                consen = ts.text_standard(doc.text)
+                ar = ts.automated_readability_index(doc.text)
+
+                # Append to dataframe
+                df = df.append({'term' : term,
+                                'fk' : fk,
+                                'smog' : smog,
+                                'consen' : consen,
+                                'ar' : ar
+                                }, ignore_index=True)
+
+        df.to_csv(os.path.join('results', dat_type + '_readability.csv'))
 
 
 if __name__ == '__main__':
