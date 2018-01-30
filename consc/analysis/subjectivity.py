@@ -14,7 +14,7 @@ def train(trainer=SklearnClassifier(LinearSVC()).train):
 	return sa
 
 
-def sent_subjectivity(text):
+def sent_subjectivity(sentence):
 	"""
 	Classify a single sentence as subjective or objective using a stored
 	SentimentAnalyzer.
@@ -24,7 +24,7 @@ def sent_subjectivity(text):
 	from nltk.classify import NaiveBayesClassifier
 	from nltk.tokenize import regexp
 
-	word_tokenizer = regexp.WhitespaceTokenizer()
+	# word_tokenizer = regexp.WhitespaceTokenizer()
 
 	# f_name = '/Users/tom/Documents/GitCode/Confidence_Scanner/scripts/sa_subjectivity.pickle'
 	f_name = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/consc/analysis/sa_subjectivity.pickle'
@@ -38,9 +38,9 @@ def sent_subjectivity(text):
 		sentim_analyzer = demo_subjectivity(NaiveBayesClassifier.train, True)
 
 	# Tokenize and convert to lower case
-	tokenized_text = [word.lower() for word in word_tokenizer.tokenize(text)]
+	# tokenized_text = [word.lower() for word in word_tokenizer.tokenize(text)]
 
-	result = str(sentim_analyzer.classify(tokenized_text))
+	result = str(sentim_analyzer.classify(sentence))
 
 	return result
 
@@ -50,7 +50,7 @@ def doc_subjectivity(document):
 	subj = 0
 	obj = 0
 
-	for sent in document.sentences:
+	for sent in document.tokens:
 		sent_subj = sent_subjectivity(sent)
 
 		if sent_subj == 'subj':

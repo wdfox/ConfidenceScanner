@@ -28,17 +28,18 @@ def doc_confidence(document, norm=False):
 
     confidence = 0
 
-    for i in document.words:
+    for i in document.tokens:
+        for j in i:
 
-        for j in HIGH_CON_WORDS:
-            if j in i:
-                confidence += 1
-                continue
+            for k in HIGH_CON_WORDS:
+                if k in j:
+                    confidence += 1
+                    continue
 
-        for k in LOW_CON_WORDS:
-            if k in i:
-                confidence -= 1
-                continue
+            for l in LOW_CON_WORDS:
+                if l in j:
+                    confidence -= 1
+                    continue
 
     if norm:
         # The try is in case of division by zero

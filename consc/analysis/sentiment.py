@@ -1,6 +1,7 @@
 ''' Sentiment Analysis with Liu Hu Lexicon '''
 
 from consc.data import load_folder
+from nltk.corpus import opinion_lexicon
 from nltk.sentiment.util import _show_plot
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
@@ -15,15 +16,16 @@ def liu_hu_lexicon(sentence, plot=False):
 	:param sentence: a sentence whose polarity has to be classified.
 	:param plot: if True, plot a visual representation of the sentence polarity.
 	"""
-	from nltk.corpus import opinion_lexicon
-	from nltk.tokenize import treebank
+	# from nltk.corpus import opinion_lexicon
+	# from nltk.tokenize import treebank
 
-	tokenizer = treebank.TreebankWordTokenizer()
+	# tokenizer = treebank.TreebankWordTokenizer()
 	pos_words = 0
 	neg_words = 0
-	tokenized_sent = [word.lower() for word in tokenizer.tokenize(sentence)]
+	# tokenized_sent = [word.lower() for word in tokenizer.tokenize(sentence)]
 
-	for word in tokenized_sent:
+	# for word in tokenized_sent:
+	for word in sentence:
 		if word in opinion_lexicon.positive():
 			pos_words += 1
 			#y.append(1) # positive
@@ -69,7 +71,7 @@ def liu_polarity(document, vote=True, normalize=False):
 
 	doc_polarity = 0
 
-	for sent in document.sentences:
+	for sent in document.tokens:
 		if vote:
 			sent_polarity = liu_hu_lexicon(sent)
 			if sent_polarity > 0:
