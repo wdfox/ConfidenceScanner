@@ -14,16 +14,16 @@ from consc.analysis.confidence import doc_confidence
 ###################################################################################################
 ###################################################################################################
 
-DAT_PATH = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/Data/'
-# DAT_PATH = '/Users/tom/Documents/GitCode/Confidence_Scanner/Data/'
+#DAT_PATH = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/Data/'
+DAT_PATH = '/Users/tom/Documents/GitCode/Confidence_Scanner/Data/'
 
-DAT_TYPES = ['PRs']
+DAT_TYPES = ['PRs', 'Papers']
 
 with open('terms.txt', 'r') as terms_file:
 	TERMS = terms_file.read().splitlines()
 
-TERMS = ['autism', 'dementia', 'epilepsy', 'stroke', 'parkinsons', 'optogenetics', 'bilingualism',
-		 'consciousness', 'perception', 'cognition', 'vaccines', 'coma', 'diabetes', 'hypertension']
+#TERMS = ['autism', 'dementia', 'epilepsy', 'stroke', 'parkinsons', 'optogenetics', 'bilingualism',
+#		 'consciousness', 'perception', 'cognition', 'vaccines', 'coma', 'diabetes', 'hypertension']
 # TERMS = ['autism', dementia]
 
 ###################################################################################################
@@ -36,7 +36,7 @@ def main():
 		print('Running ', dat_type)
 
 		# Initialize dataframe
-		df = pd.DataFrame(columns=['id', 'vader', 'liu', 'subj', 'liwc'])
+		df = pd.DataFrame(columns=['id', 'term', 'vader', 'liu', 'subj', 'liwc'])
 
 		for term in TERMS:
 
@@ -73,7 +73,7 @@ def main():
 								'liwc' : liwc
 								}, ignore_index=True)
 
-				# if ind+1 % 50 == 0:
+				#if ind+1 % 50 == 0:
 				print('\t\t', ind, 'out of', len(docs))
 
 		df.to_csv(os.path.join('results', dat_type + '_analysis_test.csv'))
