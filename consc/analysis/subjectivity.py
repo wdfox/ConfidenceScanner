@@ -25,7 +25,7 @@ def sent_subjectivity(text):
 	from nltk.tokenize import regexp
 	word_tokenizer = regexp.WhitespaceTokenizer()
 	try:
-		with open('sa_subjectivity.pickle', 'rb') as pickle_file:
+		with open('/Users/wdfox/Documents/GitCode/Confidence_Scanner/consc/analysis/sa_subjectivity.pickle', 'rb') as pickle_file:
 			sentim_analyzer = load(pickle_file)
 	except LookupError:
 		print('Cannot find the sentiment analyzer you want to load.')

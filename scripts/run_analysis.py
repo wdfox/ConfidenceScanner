@@ -38,7 +38,8 @@ def main():
 			print('\tRunning ', term)
 
 			# Load the data
-			docs = load_folder(dat_type, term, DAT_PATH, proc_text=False)
+			docs = load_folder(dat_type, term, DAT_PATH, proc_text=True)
+			print('Loaded')
 
 			for ind, doc in enumerate(docs):
 
