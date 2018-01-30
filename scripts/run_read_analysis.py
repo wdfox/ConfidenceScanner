@@ -32,7 +32,7 @@ def main():
         print('Running ', dat_type)
 
         # Initialize dataframe
-        df = pd.DataFrame(columns=['id', 'fk', 'smog', 'consen', 'ar'])
+        df = pd.DataFrame(columns=['term', 'fk', 'smog', 'consen', 'ar'])
 
         for term in TERMS:
 
@@ -61,7 +61,7 @@ def main():
                                 'ar' : ar
                                 }, ignore_index=True)
 
-        df.to_csv(os.path.join('results', dat_type + '_readability.csv'))
+        df.to_csv(os.path.join('results', dat_type + '_readability.csv'), index=False)
 
 
 if __name__ == '__main__':
