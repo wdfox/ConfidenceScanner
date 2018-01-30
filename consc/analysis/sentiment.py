@@ -1,12 +1,12 @@
-''' Sentiment Analysis with Liu Hu Lexicon '''
+"""Sentiment Analysis with Liu Hu Lexicon."""
 
 from consc.data import load_folder
 from nltk.corpus import opinion_lexicon
 from nltk.sentiment.util import _show_plot
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
-##
-##
+###################################################################################################
+###################################################################################################
 
 POS = set(opinion_lexicon.positive())
 NEG = set(opinion_lexicon.negative())
@@ -26,13 +26,10 @@ def liu_hu_lexicon(sentence, plot=False):
     pos_words = 0
     neg_words = 0
 
-    # for word in tokenized_sent:
     for word in sentence:
-        #if word in opinion_lexicon.positive():
         if word in POS:
             pos_words += 1
             #y.append(1) # positive
-        #elif word in opinion_lexicon.negative():
         elif word in NEG:
             neg_words += 1
             #y.append(-1) # negative
