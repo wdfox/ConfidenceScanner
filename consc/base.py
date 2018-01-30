@@ -64,26 +64,13 @@ class Base(object):
                     self.words.remove(word)
 
 
-
-    def tokenize_sentences(self):
+    def tokenize(self):
         """Tokenize the full text into sentences."""
 
         self.sentences = nltk.sent_tokenize(self.text)
 
-        #self.tokens = [nltk.word_tokenize(sentence) for sentence in self.sentences]
         self.tokens = [[word.lower() for word in nltk.word_tokenize(sentence) \
             if ((not word.lower() in STOPWORDS_SET) and word.isalpha())] for sentence in self.sentences]
-
-
-    # def tokenize_words(self):
-    #     """Tokenize the full text into words - removes stopwords, punctuation, and sets as lowercase."""
-
-    #     # Tokenize the input text
-    #     words = nltk.word_tokenize(self.text)
-
-    #     # Remove stop words, and non-alphabetical tokens (punctuation).
-    #     self.words = [word.lower() for word in words if ((not word.lower() in stopwords.words('english'))
-    #                                                     & word.isalnum())]
 
 
     def analyze(self):

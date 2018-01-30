@@ -236,8 +236,7 @@ def load_paper_json(path, proc_text=True):
     paper.journal = info_dict['journal']
 
     if proc_text:
-        paper.tokenize_sentences()
-        # paper.tokenize_words()
+        paper.tokenize()
 
     return(paper)
 
@@ -280,7 +279,6 @@ def load_pr_json(path, proc_text=True):
     pr.article_link = info_dict['article_link']
 
     if proc_text:
-        pr.tokenize_sentences()
-        # pr.tokenize_words()
+        pr.tokenize()
 
     return(pr)
