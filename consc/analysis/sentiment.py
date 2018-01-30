@@ -6,7 +6,6 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 
 def liu_hu_lexicon(sentence, plot=False):
-<<<<<<< HEAD
     """
     Sentiment classification using Liu and Hu opinion lexicon.
     This function simply counts the number of positive, negative and neutral words
