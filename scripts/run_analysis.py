@@ -14,7 +14,7 @@ from consc.analysis.confidence import doc_confidence
 ###################################################################################################
 ###################################################################################################
 
-#DAT_PATH = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/Data/'
+# DAT_PATH = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/Data/'
 DAT_PATH = '/Users/tom/Documents/GitCode/Confidence_Scanner/Data/'
 
 DAT_TYPES = ['PRs', 'Papers']
@@ -73,7 +73,6 @@ def main():
 								'liwc' : liwc
 								}, ignore_index=True)
 
-				#if ind+1 % 50 == 0:
 				print('\t\t', ind, 'out of', len(docs))
 
 		df.to_csv(os.path.join('results', dat_type + '_analysis_test.csv'))
