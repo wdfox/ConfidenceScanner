@@ -17,7 +17,7 @@ from consc.analysis.confidence import doc_confidence
 #DAT_PATH = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/Data/'
 DAT_PATH = '/Users/tom/Documents/GitCode/Confidence_Scanner/Data/'
 
-DAT_TYPES = ['PRs', 'Papers']
+DAT_TYPES = ['PRs']
 
 with open('terms.txt', 'r') as terms_file:
     TERMS = terms_file.read().splitlines()
