@@ -17,8 +17,8 @@ TERMS = ['autism', 'dementia']
 
 def main():
 
-	papers_analyzed = {'readability' : {}, 'vader_sentiment' : {}, 'liu_hu_sentiment' : {}, 'subjectivity' : {}, 'confidence' : {}}
-	press_analyzed = {'readability' : {}, 'vader_sentiment' : {}, 'liu_hu_sentiment' : {}, 'subjectivity' : {}, 'confidence' : {}}
+	papers_analyzed = {'vader_sentiment' : {}, 'liu_hu_sentiment' : {}, 'subjectivity' : {}, 'confidence' : {}}
+	press_analyzed = {'vader_sentiment' : {}, 'liu_hu_sentiment' : {}, 'subjectivity' : {}, 'confidence' : {}}
 
 	for term in TERMS:
 
@@ -26,25 +26,27 @@ def main():
 		papers = load_folder('Papers', term)
 		press = load_folder('PRs', term)
 
-		# Run readability 
-		papers_analyzed['readability'][term] = None
-		press_analyzed['readability'][term] = None
-
 		# Run VADER sentiment analysis
 		papers_analyzed['vader_sentiment'][term] = vader_folder(papers)
 		press_analyzed['vader_sentiment'][term] = vader_folder(press)
+		print('Passed VADER')
 
 		# Run Liu Hu sentiment analysis
 		papers_analyzed['liu_hu_sentiment'][term] = liu_folder(papers)
 		press_analyzed['liu_hu_sentiment'][term] = liu_folder(press)
+		print('Passed Liu Hu')
 
 		# Run subjectivity analysis
 		papers_analyzed['subjectivity'][term] = folder_subjectivity(papers)
 		press_analyzed['subjectivity'][term] = folder_subjectivity(press)
+		print('Passed subjectivity')
 
 		# Run LIWC confidence analysis
 		papers_analyzed['confidence'][term] = folder_confidence(papers)
 		press_analyzed['confidence'][term] = folder_confidence(press)
+		print('Passed confidence')
+
+		print('Analyzed', term)
 
 	return papers_analyzed, press_analyzed
 

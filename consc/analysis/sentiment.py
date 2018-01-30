@@ -41,12 +41,14 @@ def liu_hu_lexicon(sentence, plot=False):
 			
 	polarity = pos_words - neg_words
 
-	if pos_words > neg_words:
-		return 'pos', polarity
-	elif pos_words < neg_words:
-		return 'neg', polarity
-	elif pos_words == neg_words:
-		return 'neu', polarity
+	return polarity
+
+	# if pos_words > neg_words:
+	# 	return 'pos', polarity
+	# elif pos_words < neg_words:
+	# 	return polarity
+	# elif pos_words == neg_words:
+	# 	return polarity
 
 
 def liu_polarity(document, vote=True, normalize=False):
@@ -70,10 +72,10 @@ def liu_polarity(document, vote=True, normalize=False):
 
 	for sent in document.sentences:
 		if vote:
-			sent_polarity = liu_hu_lexicon(sent)[0]
-			if sent_polarity == 'pos':
+			sent_polarity = liu_hu_lexicon(sent)
+			if sent_polarity > 0:
 				pos_sentences += 1
-			elif sent_polarity == 'neg':
+			elif sent_polarity < 0:
 				neg_sentences += 1
 			doc_polarity = pos_sentences - neg_sentences
 		else:
@@ -83,15 +85,17 @@ def liu_polarity(document, vote=True, normalize=False):
 	if normalize:
 		doc_polarity = doc_polarity / float(len(document.sentences))
 
-	if pos_sentences > neg_sentences:
-		return 'pos', doc_polarity
-	elif pos_sentences < neg_sentences:
-		return 'neg', doc_polarity
-	elif pos_sentences == neg_sentences:
-		return 'neu', doc_polarity
+	return doc_polarity
+
+	# if pos_sentences > neg_sentences:
+	# 	return 'pos', doc_polarity
+	# elif pos_sentences < neg_sentences:
+	# 	return 'neg', doc_polarity
+	# elif pos_sentences == neg_sentences:
+	# 	return 'neu', doc_polarity
 
 
-def liu_folder(docs, vote, normalize, data_type=None, search_term=None):
+def liu_folder(docs, vote=True, normalize=False, data_type=None, search_term=None):
 
 	# docs = load_folder(data_type, search_term)
 
@@ -104,7 +108,7 @@ def vader_sentence(sentence):
 
 	sia = SentimentIntensityAnalyzer()
 
-	return sia.polarity_scores(sentence['compound'])
+	return sia.polarity_scores(sentence)['compound']
 
 
 def vader_doc(document):
