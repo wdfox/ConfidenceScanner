@@ -50,10 +50,10 @@ def doc_confidence(document, norm=False):
     return confidence
 
 
-def folder_confidence(data_type, search_term, norm=False):
+def folder_confidence(docs, norm=False, data_type=None, search_term=None):
     """   """
 
-    docs = load_folder(data_type, search_term)
+    # docs = load_folder(data_type, search_term)
 
     confidence = [doc_confidence(doc, norm) for doc in docs]
 

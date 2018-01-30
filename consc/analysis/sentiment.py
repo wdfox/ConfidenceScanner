@@ -91,9 +91,9 @@ def liu_polarity(document, vote=True, normalize=False):
 		return 'neu', doc_polarity
 
 
-def liu_folder(data_type, search_term, vote, normalize):
+def liu_folder(docs, vote, normalize, data_type=None, search_term=None):
 
-	docs = load_folder(data_type, search_term)
+	# docs = load_folder(data_type, search_term)
 
 	polarities = [liu_polarity(doc, vote, normalize) for doc in docs]
 
@@ -117,9 +117,9 @@ def vader_doc(document)
 	return polarity
 
 
-def vader_folder(data_type, search_term):
+def vader_folder(docs, data_type=None, search_term=None):
 
-	docs = load_folder(data_type, search_term)
+	# docs = load_folder(data_type, search_term)
 
 	polarities = [vader_doc(doc) for doc in docs]
 

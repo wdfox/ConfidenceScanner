@@ -58,9 +58,9 @@ def doc_subjectivity(document):
 	return doc_subjectivity
 
 
-def folder_subjectivity(data_type, search_term):
+def folder_subjectivity(docs):
 
-	docs = load_folder(data_type, search_term)
+	# docs = load_folder(data_type, search_term)
 
 	subjectivities = [doc_subjectivity(doc) for doc in docs]
 
