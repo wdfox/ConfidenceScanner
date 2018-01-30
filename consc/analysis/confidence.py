@@ -14,6 +14,7 @@ def load_corpus_words(file_name):
 
     corpus_file = open(f_path, 'r')
     corpus_words = corpus_file.read().splitlines()
+    corpus_file.close()
 
     return corpus_words
 
