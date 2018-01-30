@@ -123,7 +123,7 @@ def save(path, outfile, data):
         json.dump(info_dict, outfile)
 
 
-def load_folder(data_type, search_term, root_dir='../Data/'):
+def load_folder(data_type, search_term, root_dir='../Data/', proc_text=True):
     """Load paper or press release info from an entire directory for analysis
 
     Parameters
@@ -161,7 +161,7 @@ def load_folder(data_type, search_term, root_dir='../Data/'):
         for ind, file in enumerate(files):
             path = os.path.join(directory, file)
 
-            paper = load_paper_json(path)
+            paper = load_paper_json(path, proc_text)
             items.append(paper)
 
     elif data_type == 'PRs':
@@ -184,7 +184,7 @@ def load_folder(data_type, search_term, root_dir='../Data/'):
 
                 path = os.path.join(cur_directory, file)
 
-                pr = load_pr_json(path)
+                pr = load_pr_json(path, proc_text)
                 items.append(pr)
 
     # NOTE: This seems old, is it needed at all?
