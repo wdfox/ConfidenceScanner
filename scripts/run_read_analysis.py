@@ -38,16 +38,22 @@ def main():
         np.save('results/' + term + '_fk_press', np.array(fks_press))
 
         # # Smog Score
-        # smog_papers = smog_group(paper_dat)
-        # smog_press = smog_group(press_dat)
+        smog_papers = smog_group(paper_dat)
+        np.save('results/' + term + '_smog_papers', np.array(smog_papers))
+        smog_press = smog_group(press_dat)
+        np.save('results/' + term + '_smog_press', np.array(smog_press))
 
         # # Consensus Score
-        # consen_papers = consensus_group(paper_dat)
-        # consen_press = consensus_group(press_dat)
+        consen_papers = consensus_group(paper_dat)
+        np.save('results/' + term + '_consen_papers', np.array(consen_papers))
+        consen_press = consensus_group(press_dat)
+        np.save('results/' + term + '_consen_press', np.array(consen_press))
 
         # # Automated Readability Score
-        # ar_papers = ar_group(paper_dat)
-        # ar_press = ar_group(press_dat)
+        ar_papers = ar_group(paper_dat)
+        np.save('results/' + term + '_ar_papers', np.array(ar_papers))
+        ar_press = ar_group(press_dat)
+        np.save('results/' + term + '_ar_press', np.array(ar_press))
 
 
 if __name__ == '__main__':
