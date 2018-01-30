@@ -1,10 +1,16 @@
 """Script to Analyze Data"""
 
+from consc.data import load_folder
+
 from consc.analysis.sentiment import vader_folder, liu_folder
 from consc.analysis.subjectivity import folder_subjectivity
 from consc.analysis.confidence import folder_confidence
 
-TERMS = ['autism', 'dementia', 'epilepsy', 'stroke', 'parkinsons', 'optogenetics', 'bilingualism', 'consciousness', 'perception', 'cognition', 'vaccines', 'coma', 'diabetes', 'hypertension']
+###################################################################################################
+###################################################################################################
+
+# TERMS = ['autism', 'dementia', 'epilepsy', 'stroke', 'parkinsons', 'optogenetics', 'bilingualism', 'consciousness', 'perception', 'cognition', 'vaccines', 'coma', 'diabetes', 'hypertension']
+TERMS = ['autism', 'dementia']
 
 ###################################################################################################
 ###################################################################################################
