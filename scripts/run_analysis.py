@@ -1,5 +1,7 @@
 """Script to Analyze Data"""
 
+import numpy as np
+
 from consc.data import load_folder
 
 from consc.analysis.sentiment import vader_folder, liu_folder
@@ -26,25 +28,33 @@ def main():
 		papers = load_folder('Papers', term)
 		press = load_folder('PRs', term)
 
-		# Run VADER sentiment analysis
-		papers_analyzed['vader_sentiment'][term] = vader_folder(papers)
-		press_analyzed['vader_sentiment'][term] = vader_folder(press)
+		# VADER Sentiment Analysis
+		vader_papers = vader_folder(papers)
+		np.save('results/' + term + '_vader_papers', np.array(vader_papers))
+		vader_press = vader_folder(press)
+		np.save('results/' + term + '_vader_press', np.array(vader_press))
 		print('Passed VADER')
 
-		# Run Liu Hu sentiment analysis
-		papers_analyzed['liu_hu_sentiment'][term] = liu_folder(papers)
-		press_analyzed['liu_hu_sentiment'][term] = liu_folder(press)
+		# Liu Hu Sentiment Analysis
+		liu_papers = liu_folder(papers)
+		np.save('results/' + term + '_liu_papers', np.array(liu_papers))
+		liu_press = liu_folder(press)
+		np.save('results/' + term + '_liu_press', np.array(liu_press))
 		print('Passed Liu Hu')
 
-		# Run subjectivity analysis
-		papers_analyzed['subjectivity'][term] = folder_subjectivity(papers)
-		press_analyzed['subjectivity'][term] = folder_subjectivity(press)
-		print('Passed subjectivity')
+		# Subjectivity Analysis
+		subjectivity_papers = folder_subjectivity(papers)
+		np.save('results/' + term + '_subjectivity_papers', np.array(subjectivity_papers))
+		subjectivity_press = folder_subjectivity(press)
+		np.save('results/' + term + '_subjectivity_press', np.array(subjectivity_press))
+		print('Passed Subjectivity')
 
-		# Run LIWC confidence analysis
-		papers_analyzed['confidence'][term] = folder_confidence(papers)
-		press_analyzed['confidence'][term] = folder_confidence(press)
-		print('Passed confidence')
+		# LIWC Confidence Analysis
+		confidence_papers = folder_confidence(papers)
+		np.save('results/' + term + '_confidence_papers', np.array(confidence_papers))
+		confidence_press = folder_confidence(press)
+		np.save('results/' + term + '_confidence_press', np.array(confidence_press))
+		print('Passed LIWC Confidence')
 
 		print('Analyzed', term)
 
