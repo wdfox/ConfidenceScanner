@@ -1,6 +1,7 @@
 """LIWC Confidence Method"""
 
 import pkg_resources as pkg
+
 from consc.data import load_folder
 
 ###################################################################################################
@@ -18,26 +19,24 @@ def load_corpus_words(file_name):
 
     return corpus_words
 
-
 HIGH_CON_WORDS = load_corpus_words('positive')
 LOW_CON_WORDS = load_corpus_words('negative')
-
 
 def doc_confidence(document, norm=False):
     """   """
 
     confidence = 0
 
-    for i in document.tokens:
-        for j in i:
+    for sent in document.tokens:
+       for word in sent:
 
-            for k in HIGH_CON_WORDS:
-                if k in j:
+            for hcw in HIGH_CON_WORDS:
+                if hcw in word:
                     confidence += 1
                     continue
 
-            for l in LOW_CON_WORDS:
-                if l in j:
+            for lcw in LOW_CON_WORDS:
+                if lcw in word:
                     confidence -= 1
                     continue
 
