@@ -42,8 +42,6 @@ def sent_subjectivity(text):
 
 	result = str(sentim_analyzer.classify(tokenized_text))
 
-	print(result)
-	print(type(result))
 	return result
 
 
