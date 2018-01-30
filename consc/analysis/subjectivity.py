@@ -23,18 +23,23 @@ def sent_subjectivity(text):
 	"""
 	from nltk.classify import NaiveBayesClassifier
 	from nltk.tokenize import regexp
+
 	word_tokenizer = regexp.WhitespaceTokenizer()
+
+	f_name = '/Users/tom/Documents/GitCode/Confidence_Scanner/scripts/sa_subjectivity.pickle'
+	#f_name = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/consc/analysis/sa_subjectivity.pickle'
+
 	try:
-		with open('/Users/wdfox/Documents/GitCode/Confidence_Scanner/consc/analysis/sa_subjectivity.pickle', 'rb') as pickle_file:
+		with open(f_name, 'rb') as pickle_file:
 			sentim_analyzer = load(pickle_file)
-	except LookupError:
+	except: # LookupError:
 		print('Cannot find the sentiment analyzer you want to load.')
 		print('Training a new one using NaiveBayesClassifier.')
 		sentim_analyzer = demo_subjectivity(NaiveBayesClassifier.train, True)
 
 	# Tokenize and convert to lower case
 	tokenized_text = [word.lower() for word in word_tokenizer.tokenize(text)]
-	
+
 	result = sentim_analyzer.classify(tokenized_text)
 
 	return result

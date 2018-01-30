@@ -23,22 +23,21 @@ def liu_hu_lexicon(sentence, plot=False):
 	neg_words = 0
 	tokenized_sent = [word.lower() for word in tokenizer.tokenize(sentence)]
 
-	x = list(range(len(tokenized_sent))) # x axis for the plot
-	y = []
-
 	for word in tokenized_sent:
 		if word in opinion_lexicon.positive():
 			pos_words += 1
-			y.append(1) # positive
+			#y.append(1) # positive
 		elif word in opinion_lexicon.negative():
 			neg_words += 1
-			y.append(-1) # negative
+			#y.append(-1) # negative
 		else:
-			y.append(0) # neutral
+			#y.append(0) # neutral
 
 	if plot == True:
+		x = list(range(len(tokenized_sent))) # x axis for the plot
+		y = []
 		_show_plot(x, y, x_labels=tokenized_sent, y_labels=['Negative', 'Neutral', 'Positive'])
-			
+
 	polarity = pos_words - neg_words
 
 	return polarity
@@ -112,7 +111,7 @@ def vader_sentence(sentence):
 
 
 def vader_doc(document):
-	
+
 	polarity = 0
 
 	for sent in document.sentences:
