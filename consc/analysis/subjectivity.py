@@ -26,8 +26,8 @@ def sent_subjectivity(text):
 
 	word_tokenizer = regexp.WhitespaceTokenizer()
 
-	f_name = '/Users/tom/Documents/GitCode/Confidence_Scanner/scripts/sa_subjectivity.pickle'
-	#f_name = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/consc/analysis/sa_subjectivity.pickle'
+	# f_name = '/Users/tom/Documents/GitCode/Confidence_Scanner/scripts/sa_subjectivity.pickle'
+	f_name = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/consc/analysis/sa_subjectivity.pickle'
 
 	try:
 		with open(f_name, 'rb') as pickle_file:
@@ -40,7 +40,7 @@ def sent_subjectivity(text):
 	# Tokenize and convert to lower case
 	tokenized_text = [word.lower() for word in word_tokenizer.tokenize(text)]
 
-	result = sentim_analyzer.classify(tokenized_text)
+	result = str(sentim_analyzer.classify(tokenized_text))
 
 	return result
 
@@ -53,9 +53,9 @@ def doc_subjectivity(document):
 	for sent in document.sentences:
 		sent_subj = sent_subjectivity(sent)
 
-		if sent_subjectivity == 'subj':
+		if sent_subj == 'subj':
 			subj += 1
-		elif sent_subjectivity == 'obj':
+		elif sent_subj == 'obj':
 			obj += 1
 
 	doc_subjectivity = subj - obj
