@@ -1,73 +1,73 @@
-''' Subjectivity Rating with NLTK '''
+"""Subjectivity Rating with NLTK."""
 
 from nltk.sentiment.util import demo_subjectivity
 from nltk.classify.scikitlearn import SklearnClassifier
+from nltk.classify import NaiveBayesClassifier
 from sklearn.svm import LinearSVC
 from pickle import load
 
+###################################################################################################
+###################################################################################################
 
+WEIGHTS_FILE = '/Users/tom/Documents/GitCode/Confidence_Scanner/scripts/sa_subjectivity.pickle'
+#WEIGHTS_FILE = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/consc/analysis/sa_subjectivity.pickle'
+
+try:
+    with open(WEIGHTS_FILE, 'rb') as pickle_file:
+        SENTIM_ANALYZER = load(pickle_file)
+except: # LookupError:
+    print('Cannot find the sentiment analyzer you want to load.')
+    print('Training a new one using NaiveBayesClassifier.')
+    SENTIM_ANALYZER = demo_subjectivity(NaiveBayesClassifier.train, True)
+
+###################################################################################################
+###################################################################################################
+
+# NOTE: Is this used anywhere?
 def train(trainer=SklearnClassifier(LinearSVC()).train):
 
-	# Train on demo data from NLTK (default is an SVM)
-	sa = demo_subjectivity(trainer, save_analyzer=True)
+    # Train on demo data from NLTK (default is an SVM)
+    sa = demo_subjectivity(trainer, save_analyzer=True)
 
-	return sa
+    return sa
 
+# def sent_subjectivity(sentence):
+#   """
+#   Classify a single sentence as subjective or objective using a stored
+#   SentimentAnalyzer.
 
-def sent_subjectivity(sentence):
-	"""
-	Classify a single sentence as subjective or objective using a stored
-	SentimentAnalyzer.
+#   :param text: a sentence whose subjectivity has to be classified.
+#   """
 
-	:param text: a sentence whose subjectivity has to be classified.
-	"""
-	from nltk.classify import NaiveBayesClassifier
-	from nltk.tokenize import regexp
-
-	# word_tokenizer = regexp.WhitespaceTokenizer()
-
-	# f_name = '/Users/tom/Documents/GitCode/Confidence_Scanner/scripts/sa_subjectivity.pickle'
-	f_name = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/consc/analysis/sa_subjectivity.pickle'
-
-	try:
-		with open(f_name, 'rb') as pickle_file:
-			sentim_analyzer = load(pickle_file)
-	except: # LookupError:
-		print('Cannot find the sentiment analyzer you want to load.')
-		print('Training a new one using NaiveBayesClassifier.')
-		sentim_analyzer = demo_subjectivity(NaiveBayesClassifier.train, True)
-
-	# Tokenize and convert to lower case
-	# tokenized_text = [word.lower() for word in word_tokenizer.tokenize(text)]
-
-	result = str(sentim_analyzer.classify(sentence))
-
-	return result
+#   return str(SENTIM_ANALYZER.classify(sentence))
 
 
 def doc_subjectivity(document):
 
-	subj = 0
-	obj = 0
+    subj = 0
+    obj = 0
 
-	for sent in document.tokens:
-		sent_subj = sent_subjectivity(sent)
+    for sent in document.tokens:
 
-		if sent_subj == 'subj':
-			subj += 1
-		elif sent_subj == 'obj':
-			obj += 1
+        # Classify a single sentence as subjective or objective
+        #  This approach uses 'SentimentAnalyzer'
+        sent_subj = str(SENTIM_ANALYZER.classify(sent))
 
-	doc_subjectivity = subj - obj
+        #sent_subj = sent_subjectivity(sent)
 
-	return doc_subjectivity
+        if sent_subj == 'subj':
+            subj += 1
+        elif sent_subj == 'obj':
+            obj += 1
+
+    doc_subjectivity = subj - obj
+
+    return doc_subjectivity
 
 
 def folder_subjectivity(docs):
 
-	# docs = load_folder(data_type, search_term)
+    subjectivities = [doc_subjectivity(doc) for doc in docs]
 
-	subjectivities = [doc_subjectivity(doc) for doc in docs]
-
-	return subjectivities
+    return subjectivities
 
