@@ -107,7 +107,7 @@ def vader_sentence(sentence):
 	return sia.polarity_scores(sentence['compound'])
 
 
-def vader_doc(document)
+def vader_doc(document):
 	
 	polarity = 0
 
