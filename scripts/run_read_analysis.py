@@ -52,7 +52,7 @@ def main():
                     uid = term[:3] + str(ind)
 
                 # Calculate readability measures
-                fks = ts.flesch_kincaid_ease(doc.text)
+                fks = ts.flesch_reading_ease(doc.text)
                 fkg = ts.flesch_kincaid_grade(doc.text)
                 smog = ts.smog_index(doc.text)
                 ar = ts.automated_readability_index(doc.text)
