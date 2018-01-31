@@ -14,8 +14,8 @@ from consc.analysis.confidence import doc_confidence
 ###################################################################################################
 ###################################################################################################
 
-# DAT_PATH = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/Data/'
-DAT_PATH = '/Users/tom/Documents/GitCode/Confidence_Scanner/Data/'
+DAT_PATH = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/Data/'
+# DAT_PATH = '/Users/tom/Documents/GitCode/Confidence_Scanner/Data/'
 
 DAT_TYPES = ['PRs', 'Papers']
 
@@ -75,7 +75,7 @@ def main():
 
 				print('\t\t', ind, 'out of', len(docs))
 
-		df.to_csv(os.path.join('results', dat_type + '_analysis_test.csv'))
+		df.to_csv(os.path.join('results', dat_type + '_analysis.csv'))
 
 
 if __name__ == '__main__':
