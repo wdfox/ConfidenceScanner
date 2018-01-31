@@ -9,8 +9,8 @@ from pickle import load
 ###################################################################################################
 ###################################################################################################
 
-WEIGHTS_FILE = '/Users/tom/Documents/GitCode/Confidence_Scanner/scripts/sa_subjectivity.pickle'
-# WEIGHTS_FILE = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/consc/analysis/sa_subjectivity.pickle'
+# WEIGHTS_FILE = '/Users/tom/Documents/GitCode/Confidence_Scanner/scripts/sa_subjectivity.pickle'
+WEIGHTS_FILE = '/Users/wdfox/Documents/GitCode/Confidence_Scanner/consc/analysis/sa_subjectivity.pickle'
 
 try:
     with open(WEIGHTS_FILE, 'rb') as pickle_file:
