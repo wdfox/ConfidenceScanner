@@ -30,7 +30,7 @@ def main():
         print('Running ', dat_type)
 
         # Initialize dataframe
-        df = pd.DataFrame(columns=['term', 'id', 'fk', 'smog', 'consen', 'ar'])
+        df = pd.DataFrame(columns=['id', 'term', 'fks', 'fkg', 'smog', 'ar', 'lwf'])
 
         for term in TERMS:
 
