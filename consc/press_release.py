@@ -23,8 +23,24 @@ class Press_Release(Base):
         Date that the paper or press release was collected.
     url : str
         URL where the press release is found.
-    source : str
+    institution : str
         Original organization which published the press release.
+    description : str
+        Short description of the press release content
+    keywords : list
+        List of words associated with the release
+    funder : str
+        Institution which funded the research discussed
+    journal : str
+        Journal which published the relevant study
+    meeting : str
+        xx
+    region : str
+        xx
+    source_link : str
+        Link to original research source
+    article_link : str
+        Link to originally published article
 
     See Also
     --------
@@ -91,7 +107,6 @@ class Press_Release(Base):
         -----
         - Possible that prs may be missing one or more of these fields
         - process_pr() function and pr heuristics could be improved
-        - May need to change the self.year extraction
         """
 
         # Set attributes to be the extracted info from press release.
@@ -165,12 +180,8 @@ def _process_pr_text(article):
 
     Returns
     -------
-    words_cleaned : list of str
-        List of words, after processing.
-
-    Notes
-    -----
-    - This function is just heuristics right now - could be improved.
+    text : str
+        Words, after processing.
     """
 
     text = str()
