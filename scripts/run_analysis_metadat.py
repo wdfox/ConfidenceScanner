@@ -28,8 +28,8 @@ def main():
         print('Running ', dat_type)
 
         # Initialize dataframe
-        df = pd.DataFrame(columns=['id', 'term', 'n_words', 'has_source_link', 'has_article_link',
-                                   'has_other_link', 'region', 'journal'])
+        df = pd.DataFrame(columns=['id', 'term', 'n_words', 'n_sentences', 'has_source_link',
+                                   'has_article_link', 'has_other_link', 'region', 'journal'])
 
         for term in TERMS:
 
@@ -52,6 +52,7 @@ def main():
 
                 # Genera meta-data
                 n_words = len(list(chain(*doc.tokens)))
+                n_sentences = len(doc.tokens)
 
                 # PR specific meta-data
                 if dat_type == 'PRs':
@@ -75,6 +76,7 @@ def main():
                 df = df.append({'id' : uid,
                                 'term' : term,
                                 'n_words' : n_words,
+                                'n_sentences' : n_sentences,
                                 'has_source_link' : has_source_link,
                                 'has_article_link' : has_article_link,
                                 'has_other_link' : has_other_link,
