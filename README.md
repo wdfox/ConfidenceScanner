@@ -18,7 +18,7 @@ Scripts are separated into analysis and collection. The collection script can be
 The data used in the writing of the paper is available in the Data folder on GitHub. 
 
 ## Development
-All functions were developed and tested in Python 2.7 and Python 3.4, and may not be fully compatible with other versions of Python. 
+Functions were developed and tested in Python 2.7 and Python 3.4, and may not be fully compatible with other versions of Python. 
 
 Software developed in collaboration with Tom Donoghue and the lab of Professor Voytek at UC San Diego and takes some inspiration from ERP_SCANR: https://github.com/TomDonoghue/ERP_SCANR. 
 
