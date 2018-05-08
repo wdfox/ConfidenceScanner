@@ -1,12 +1,13 @@
 '''Test cases for Com_Scanner classes and functions'''
 
+import datetime
+
+from bs4 import BeautifulSoup
+
 import consc.base
 import consc.requester
 import consc.urls
 import consc.data
-
-import datetime
-from bs4 import BeautifulSoup
 
 
 """ Tests for scraping """
@@ -162,18 +163,3 @@ from bs4 import BeautifulSoup
 # print(paper_list)
 # print(len(paper_list))
 
-
-"""
-
-NOTES:
-- Other study only looked at MAIN causal claims--but what if the text later works to caveat the main claim?
-
-
-Read 2014 Sumner Paper and anything from reference list on Tom's paper by relevance
-Look at Google Scholar for relevant papers maybe?
-Read papers from tom
-Try out sentiment analysis (out of the box nltk) try using a jupyter notebook (scores for text difficulty, sentiment, etc.) maybe textblob
-PR Scraping
-What kinds of analysis to run
-
-"""

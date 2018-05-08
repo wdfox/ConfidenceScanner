@@ -1,7 +1,7 @@
 """Functions for data management, and saving/loading for the consc project."""
 
-import os
 import json
+import os
 from shutil import copy2
 
 from consc.paper import Paper

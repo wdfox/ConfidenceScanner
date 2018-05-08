@@ -1,16 +1,32 @@
 """Functions for using Selenium Webdriver for webpage emulation and scraping."""
 
-import time
 import random
+import time
+
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium import webdriver
 
 ###################################################################################################
 ###################################################################################################
 
 def pr_crawl(driver, pr_count, search_term, start_date, end_date):
+    """Collects a given number of press releases related to a given term
+
+    Parameters
+    ----------
+    search_term : str
+        Papers returned will be associated with this term
+    start_date : datetime object
+        Beginning date for relevant publications
+    end_date : datetime object
+        End date for relevant publications
+    pr_count : int
+        Number of press releases to be collected and saved
+    driver : Bool
+        Whether to employ the EUtils use_history feature for large scrapes
+    """
 
     # Initialize a webdriver so Selenium can emulate the page
     # driver = webdriver.Safari()
