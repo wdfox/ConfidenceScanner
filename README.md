@@ -36,3 +36,4 @@ If this software was useful for your work, please credit it by citing our paper:
 * NLTK
 * BeautifulSoup
 * Selenium
+* textstat (Python 2.7 Only)
