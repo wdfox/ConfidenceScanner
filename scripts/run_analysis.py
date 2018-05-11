@@ -6,10 +6,9 @@ import numpy as np
 import pandas as pd
 
 from consc.data import load_folder
-
+from consc.analysis.confidence import doc_confidence
 from consc.analysis.sentiment import vader_doc, liu_polarity
 from consc.analysis.subjectivity import doc_subjectivity
-from consc.analysis.confidence import doc_confidence
 
 ###################################################################################################
 ###################################################################################################

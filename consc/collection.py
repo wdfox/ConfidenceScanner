@@ -7,19 +7,19 @@ Notes
 - TODO: This organization uses more requester objects than it needs to. Could be condensed.
 """
 
-import time
-import random
 import datetime
-from bs4 import BeautifulSoup
+import random
+import time
 
-import consc.urls as urls
-import consc.data as data
+from bs4 import BeautifulSoup
+from selenium import webdriver
+
 import consc.crawl as crawl
-from consc.requester import Requester
+import consc.data as data
 from consc.paper import Paper
 from consc.press_release import Press_Release
-
-from selenium import webdriver
+from consc.requester import Requester
+import consc.urls as urls
 
 ###################################################################################################
 ###################################################################################################
@@ -31,14 +31,14 @@ def collect_papers(search_term, start_date=None, end_date=None, paper_count=5000
     ----------
     search_term : str
         Papers returned will be associated with this term
+    start_date : datetime object
+        Beginning date for relevant publications
+    end_date : datetime object
+        End date for relevant publications
     paper_count : int
         Number of papers to be collected and saved
     use_hist : Bool
         Whether to employ the EUtils use_history feature for large scrapes
-
-    Notes
-    -----
-    - Decide between a temp file or archive
     """
 
     # Initialize a Requester object to handle URLs
@@ -100,9 +100,8 @@ def collect_papers(search_term, start_date=None, end_date=None, paper_count=5000
         # Scrape and save data for each article into JSON
         scrape_paper_data(art_url, path)
 
-    # NOTE: do we have to do this?
     # Clear archived data after a successful scrape
-    #data.clear_archive()
+    # data.clear_archive()
 
 
 def collect_prs(search_term, start_date, end_date, driver, pr_count=500):
@@ -116,6 +115,8 @@ def collect_prs(search_term, start_date, end_date, driver, pr_count=500):
         Start date for PRs to be collected.
     end_date : datetime.date
         End date for PRs to be collected.
+    driver : selenium webdriver
+        The driver with which to open websites in selenium automation
     pr_count : int
         Number of press releases to be collected and saved
 
@@ -143,7 +144,7 @@ def collect_prs(search_term, start_date, end_date, driver, pr_count=500):
         path = data.build_path(data_type='PRs', search_term=search_term, batch=str(scrape_start_date))
 
         # Retrieve press release URLS
-        pr_links = crawl.pr_crawl(driver, pr_count=pr_count, search_term=search_term, start_date=scrape_start_date, end_date=scrape_end_date)
+        pr_links = crawl.pr_crawl(search_term=search_term, start_date=scrape_start_date, end_date=scrape_end_date, driver=driver, pr_count=pr_count)
 
         # Create a list of press release URLs to be saved
         pr_urls = [db_url+link for link in pr_links]
@@ -240,6 +241,6 @@ def scrape_pr_data(url, path):
     req.close()
 
     # Ensure all attributes are of the correct type
-    #pr._check_type()
+    # pr._check_type()
 
     return(pr)

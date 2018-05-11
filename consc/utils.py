@@ -4,6 +4,7 @@
 ###################################################################################################
 
 def check_extract(tag, label):
+    """Return the text from a given HTML label, if it exists"""
 
     try:
         return tag.find(label).text

@@ -72,30 +72,3 @@ class Base(object):
         self.tokens = [[word.lower() for word in nltk.word_tokenize(sentence) \
             if ((not word.lower() in STOPWORDS_SET) and word.isalpha())] for sentence in self.sentences]
 
-
-    def analyze(self):
-        """Runs confidence analysis on text from paper or press release.
-
-        Notes
-        -----
-        - What if we trained an algorithm on papers and prs and then had it try to sort unknown texts into one of the categories and see if it can?
-        - Maybe consider not tokenizing by words, but by sentence or phrase as well?
-        - Linguistic Inquiry and Work Count (LIWC) -- (http://liwc.wpengine.com)
-        - Wordnet (http://wordnet.princeton.edu/), SentiWordnet (http://sentiwordnet.isti.cnr.it/)
-        - Pointwise Mutual Information for Information Retrieval? (PMI-IR)
-        - Perhaps use SentiStrength for positive/negitive identification
-        - Useful powerpoint (https://lct-master.org/files/MullenSentimentCourseSlides.pdf)
-        - Word database development paper (https://arxiv.org/pdf/1103.2903.pdf)
-        - Use text level (reading/writing level) as a control
-        - Consider not tokenizing text, save both ways
-        - python textblob library maybe?
-        """
-
-        classification = nltk.sentiment.util.demo_liu_hu_lexicon(self.text)
-        print(classification)
-
-        subjectivity = nltk.sentiment.util.demo_sent_subjectivity(self.text)
-        print(subjectivity)
-
-        VADER = nltk.sentiment.util.demo_vader_instance(self.text)
-        print(VADER)

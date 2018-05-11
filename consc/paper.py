@@ -23,6 +23,8 @@ class Paper(Base):
         Date that the paper or press release was collected.
     id : str
         ID number of the paper from PubMed database.
+    doi : str
+        DOI of the paper (if exists)
     authors : list of tuple of (str, str, str, str)
         List of authors, as (LastName, FirstName, Initials, Affiliation).
     journal : tuple (str, str)
@@ -129,8 +131,8 @@ def _process_paper(abstract_tags):
 
     Returns
     -------
-    words_cleaned : list of str
-        List of words, after processing.
+    text : str
+        Words, after processing all tags.
     """
 
     # Initialize a variable to store the abstract text
@@ -158,10 +160,6 @@ def _process_authors(author_list):
     -------
     out : list of tuple of (str, str, str, str)
         List of authors, as (LastName, FirstName, Initials, Affiliation).
-
-    Notes
-    -----
-    - Current try except could be cleaned up?
     """
 
     # Pull out all author tags from the input
