@@ -1,7 +1,7 @@
 # Confidence Scanner
 
 ## General
-The Confidence Scanner is a project for automated collection and analysis of scientific text samples. The functionality can be broken into two primary steps. In the data collection phase, paper abstracts are gathered from PubMed, a repository for scientific papers specifically in Medicine and the Life Sciences, and press releases are scraped from EurekAlert, a public database for scientific press releases from a variety of research institutions and fields. Analysis consists of four different tests--Readability, Sentiment, Subjectivity, and Confidence. 
+The Confidence Scanner is a project for automated collection and analysis of scientific text samples. The functionality can be broken into two primary steps. In the data collection phase, paper abstracts are gathered from PubMed, a repository for scientific papers specifically in Medicine and the Life Sciences, and press releases are scraped from EurekAlert, a public database for scientific press releases from a variety of research institutions and fields. Analysis consists of four different tests--Readability, Sentiment, Subjectivity, and Confidence. A paper written for the CogSci 2018 conference further detailing the analysis can be found [here](http://mindmodeling.org/cogsci2018/papers/0324/index.html).
 
 ## Organization and Usage
 
