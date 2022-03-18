@@ -24,7 +24,7 @@ Software developed in collaboration with Tom Donoghue and the lab of Professor V
 
 Constructive criticism, corrections, and potential improvements are welcome.
 
-E-mail: wdfox{at}mit{dot}edu
+E-mail: wdfox3{at}gmail{dot}com
 
 ## Citation
 If this software was useful for your work, please credit it by citing our paper:
